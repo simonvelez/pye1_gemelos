@@ -3,9 +3,10 @@ library(shinydashboard)
 library(shinylive)
 library(httpuv)
 
+char_variables <- sum(sapply(twins_2_, is.character))
 
 # Cargar los datos de la base de datos
-
+char_variables <- sum(sapply(twins_2_, is.character))
 # Definir la interfaz de usuario (UI)
 ui <- dashboardPage(
   dashboardHeader(title = "Gemelos"),
@@ -73,10 +74,17 @@ server <- function(input, output) {
         as.numeric(twins_2_[[selected_variable_x_2]]),
         main = paste("Dotchart de", selected_variable_x_2),
         xlab = selected_variable_x_2,
-        ylab = "HRWAGEL"
+        ylab = "HRWAGEL",
+        
       )
     })
   })
+  
+  #Mostrar la cantidad de variables de tipo caracter
+  output$char_data_count <- renderText({
+    paste("Ccolumnas incompletas:", char_variables)
+  })
+  
 }
 
 # Ejecutar la aplicación Shiny
