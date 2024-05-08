@@ -70,3 +70,27 @@ server <- function(input, output) {
 
 # Ejecutar la aplicación Shiny
 shinyApp(ui = ui, server = server)
+
+
+
+
+
+
+
+
+library(base)
+# Determinar el número de registros y variables
+num_registros <- nrow(twins_2_)
+num_variables <- ncol(twins_2_)
+
+# Determinar el número de registros con al menos un dato faltante
+registros_con_faltantes <- sum(rowSums(is.na(twins_2_)) > 0)
+
+# Determinar el número de registros con información completa
+registros_completos <- sum(complete.cases(twins_2_))
+
+# Mostrar el reporte
+cat("Número de registros:", num_registros, "\n")
+cat("Número de variables:", num_variables, "\n")
+cat("Registros con al menos un dato faltante:", registros_con_faltantes, "\n")
+cat("Registros con información completa:", registros_completos, "\n")
