@@ -3,10 +3,10 @@ library(shinydashboard)
 library(shinylive)
 library(httpuv)
 
-char_variables <- sum(sapply(twins_2_, is.character))
+char_variables <- sum(sapply(twins, is.character))
 
 # Cargar los datos de la base de datos
-char_variables <- sum(sapply(twins_2_, is.character))
+char_variables <- sum(sapply(twins, is.character))
 # Definir la interfaz de usuario (UI)
 ui <- dashboardPage(
   dashboardHeader(title = "Gemelos"),
@@ -56,7 +56,7 @@ server <- function(input, output) {
     
     output$dotchart_1 <- renderPlot({
       dotchart(
-        as.numeric(twins_2_[[selected_variable_x_1]]),
+        as.numeric(twins[[selected_variable_x_1]]),
         main = paste("Dotchart de", selected_variable_x_1),
         xlab = selected_variable_x_1,
         ylab = "DLHRWAGE"
@@ -71,7 +71,7 @@ server <- function(input, output) {
     
     output$dotchart_2 <- renderPlot({
       dotchart(
-        as.numeric(twins_2_[[selected_variable_x_2]]),
+        as.numeric(twins[[selected_variable_x_2]]),
         main = paste("Dotchart de", selected_variable_x_2),
         xlab = selected_variable_x_2,
         ylab = "HRWAGEL",
