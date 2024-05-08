@@ -1,5 +1,8 @@
 library(shiny)
 library(shinydashboard)
+library(shinylive)
+library(httpuv)
+
 
 # Cargar los datos de la base de datos
 
@@ -8,12 +11,11 @@ ui <- dashboardPage(
   dashboardHeader(title = "Gemelos"),
   dashboardSidebar(
     sidebarMenu(
-    #diseño del icono de graficos
-      menuItem("Gráficos", tabName = "graficos", icon = icon("chart-line"))
+      menuItem("Gráficos", tabName = "graficos", icon = icon("chart-line")),
+      menuItem("Reporte", TabName= "Reporte",icon = icon("search"))
     )
   ),
   dashboardBody(
-    #botones de el dashboard 
     tabItems(
       tabItem(
         tabName = "graficos",
@@ -30,6 +32,14 @@ ui <- dashboardPage(
           plotOutput("dotchart_1"),
           plotOutput("dotchart_2")
         )
+      ),
+      tabItem(
+        tabName = "Reporte",
+        sidebarPanel(
+          
+          
+        )
+        
       )
     )
   )
@@ -37,6 +47,7 @@ ui <- dashboardPage(
 
 # Definir la lógica del servidor
 server <- function(input, output) {
+  
   # Gráfico 1
   observeEvent(input$plotBtn_1, {
     req(input$var_x_1)
