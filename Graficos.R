@@ -1,14 +1,18 @@
 library(shiny)
 library(shinydashboard)
 library(shinylive)
+library(base)
 library(httpuv)
 
 # Cargar los datos de la base de datos
 twins <- read.csv("twins.txt", header = TRUE)
 
 
-# Contar las variables de tipo carácter en 'twins'
+# Calcular las variables necesarias para el reporte
+num_registros <- nrow(twins)
+num_variables <- ncol(twins)
 char_variables <- sum(sapply(twins, is.character))
+registros_completos <- sum(complete.cases(twins))
 
 # Definir la interfaz de usuario (UI)
 ui <- dashboardPage(
@@ -39,8 +43,12 @@ ui <- dashboardPage(
       ),
       tabItem(
         tabName = "Reporte",
-        sidebarPanel(
-          # Espacio para más contenido del panel lateral
+        fluidRow(
+          box(
+            title = "Reporte de Datos",
+            width = 12,
+            verbatimTextOutput("reporte")
+          )
         )
       )
     )
@@ -83,6 +91,14 @@ server <- function(input, output) {
   # Mostrar la cantidad de variables de tipo carácter
   output$char_data_count <- renderText({
     paste("Columnas de tipo carácter:", char_variables)
+  })
+  
+  # Mostrar el reporte de datos en la pestaña de reporte
+  output$reporte <- renderText({
+    paste("Número de registros:", num_registros, "\n",
+          "Número de variables:", num_variables, "\n",
+          "Registros con al menos un dato faltante:", char_variables, "\n",
+          "Registros con información completa:", registros_completos)
   })
   
 }
