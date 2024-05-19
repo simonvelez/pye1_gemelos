@@ -1,6 +1,5 @@
 # Cargar las bibliotecas necesarias
 library(shiny)
-print(twins)
 library(ggplot2)
 
 #twins <- as.numeric(twins$DLHRWAGE)

@@ -3,17 +3,20 @@ library(shinydashboard)
 library(shinylive)
 library(httpuv)
 
+# Cargar los datos de la base de datos
+twins <- read.csv("twins.txt", header = TRUE)
+
+
+# Contar las variables de tipo carácter en 'twins'
 char_variables <- sum(sapply(twins, is.character))
 
-# Cargar los datos de la base de datos
-char_variables <- sum(sapply(twins, is.character))
 # Definir la interfaz de usuario (UI)
 ui <- dashboardPage(
   dashboardHeader(title = "Gemelos"),
   dashboardSidebar(
     sidebarMenu(
       menuItem("Gráficos", tabName = "graficos", icon = icon("chart-line")),
-      menuItem("Reporte", TabName= "Reporte",icon = icon("search"))
+      menuItem("Reporte", tabName = "Reporte", icon = icon("search"))
     )
   ),
   dashboardBody(
@@ -21,12 +24,12 @@ ui <- dashboardPage(
       tabItem(
         tabName = "graficos",
         sidebarPanel(
-          selectInput("var_x_1", "Seleccionar variable para el eje Y, para el gemelo1:",
-                      choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH"," DMARRIED", "DUNCOV")),
+          selectInput("var_x_1", "Seleccionar variable para el eje Y, para el gemelo 1:",
+                      choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV")),
           actionButton("plotBtn_1", "Generar Gráfico gemelo 1"),
           
-          selectInput("var_x_2", "Seleccionar variable para el eje Y, para el gemelo2:",
-                      choices = c("WHITEL","AGESQ",  "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
+          selectInput("var_x_2", "Seleccionar variable para el eje Y, para el gemelo 2:",
+                      choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
           actionButton("plotBtn_2", "Generar Gráfico gemelo 2")
         ),
         mainPanel(
@@ -37,10 +40,8 @@ ui <- dashboardPage(
       tabItem(
         tabName = "Reporte",
         sidebarPanel(
-          
-          
+          # Espacio para más contenido del panel lateral
         )
-        
       )
     )
   )
@@ -74,21 +75,18 @@ server <- function(input, output) {
         as.numeric(twins[[selected_variable_x_2]]),
         main = paste("Dotchart de", selected_variable_x_2),
         xlab = selected_variable_x_2,
-        ylab = "HRWAGEL",
-        
+        ylab = "HRWAGEL"
       )
     })
   })
   
-  #Mostrar la cantidad de variables de tipo caracter
+  # Mostrar la cantidad de variables de tipo carácter
   output$char_data_count <- renderText({
-    paste("Ccolumnas incompletas:", char_variables)
+    paste("Columnas de tipo carácter:", char_variables)
   })
   
 }
 
 # Ejecutar la aplicación Shiny
 shinyApp(ui = ui, server = server)
-
-
 
