@@ -190,7 +190,8 @@ server <- function(input, output) {
     
     output$dotchart_1 <- renderPlot({
       dotchart(
-        as.numeric(twins[[selected_variable_x_1]]),
+        y = twins$HRWAGEH,
+        x =as.numeric(twins[[selected_variable_x_1]]),
         main = paste("Dotchart de", selected_variable_x_1),
         xlab = selected_variable_x_1,
         ylab = "DLHRWAGE"
@@ -205,7 +206,8 @@ server <- function(input, output) {
     
     output$dotchart_2 <- renderPlot({
       dotchart(
-        as.numeric(twins[[selected_variable_x_2]]),
+        y = twins$HRWAGEH,
+        x=as.numeric(twins[[selected_variable_x_2]]),
         main = paste("Dotchart de", selected_variable_x_2),
         xlab = selected_variable_x_2,
         ylab = "HRWAGEL"
