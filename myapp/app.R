@@ -6,7 +6,8 @@ library(httpuv)
 library(DT)
 library(shinyjs)  # Para usar funciones de JavaScript
 
-
+# Cargar los datos de la base de datos
+twins <- read.csv("twins.txt", header = TRUE)
 
 # Calcular las variables necesarias para el reporte
 num_registros <- nrow(twins)
@@ -62,8 +63,6 @@ ui <- dashboardPage(
     tabItems(
       tabItem(
         tabName = "Introduccion",
-        
-        
         fluidRow(
           box(
             title = "Introducción",
@@ -112,6 +111,24 @@ ui <- dashboardPage(
 
 # Definir la lógica del servidor
 server <- function(input, output) {
+  # Leer archivo de Excel y preparar los datos
+  data <- eventReactive(input$file, {
+    req(input$file)
+    
+    # Leer los datos del archivo de Excel
+    twins <- read_excel(input$file$datapath)
+    
+    # Convertir las columnas a numérico
+    cols_to_convert <- c("DLHRWAGE", "DEDUC1", "AGE", "AGESQ", "HRWAGEH", "WHITEH", "MALEH", 
+                         "EDUCH", "HRWAGEL", "WHITEL", "MALEL", "EDUCL", "DEDUC2", "DTEN", 
+                         "DMARRIED", "DUNCOV")
+    twins[cols_to_convert] <- lapply(twins[cols_to_convert], as.numeric)
+    
+    # Crear una nueva tabla sin NAs
+    twins_copia1 <- na.omit(twins)
+    
+    list(original = twins, copia1 = twins_copia1)
+  })
   
   
   
@@ -170,15 +187,13 @@ server <- function(input, output) {
   })
   
   # Mostrar el reporte de datos en la pestaña de reporte
-  output$reporte <- renderText({
-    paste("Número de registros:", num_registros, "\n",
-          "Número de variables:", num_variables, "\n",
-          "Registros con al menos un dato faltante:", char_variables, "\n",
-          "Registros con información completa:", registros_completos)
+  output$texto_introduccion <- renderText({
+    paste("Número de registros:", nrow(twins), "\n",
+          "Número de variables:", ncol(twins), "\n",
+          "Registros con información completa:", nrow(twins_copia1))
   })
-  
-  
 }
+  
 
 # Ejecutar la aplicación Shiny
 shinyApp(ui = ui, server = server)
