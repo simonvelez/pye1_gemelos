@@ -4,27 +4,55 @@ library(shinylive)
 library(base)
 library(httpuv)
 
-# Cargar los datos de la base de datos
-twins <- read.csv("twins.txt", header = TRUE)
-
-
 # Calcular las variables necesarias para el reporte
 num_registros <- nrow(twins)
 num_variables <- ncol(twins)
-char_variables <- sum(sapply(twins, is.character))
-registros_completos <- sum(complete.cases(twins))
+
+#convierte las 16 columnas en numeric 
+twins$DLHRWAGE<- as.numeric(twins$DLHRWAGE)
+twins$DEDUC1<- as.numeric(twins$DEDUC1)
+twins$AGE<- as.numeric(twins$AGE)
+twins$AGESQ<- as.numeric(twins$AGESQ)
+twins$HRWAGEH<- as.numeric(twins$HRWAGEH)
+twins$WHITEH<- as.numeric(twins$WHITEH)
+twins$MALEH<- as.numeric(twins$MALEH)
+twins$EDUCH<- as.numeric(twins$EDUCH)
+twins$HRWAGEL<- as.numeric(twins$HRWAGEL)
+twins$WHITEL<- as.numeric(twins$WHITEL)
+twins$MALEL<- as.numeric(twins$MALEL)
+twins$EDUCL<- as.numeric(twins$EDUCL)
+twins$DEDUC2<- as.numeric(twins$DEDUC2)
+twins$DTEN<- as.numeric(twins$DTEN)
+twins$DMARRIED<- as.numeric(twins$DMARRIED)
+twins$DUNCOV<- as.numeric(twins$DUNCOV)
+
+
+#crear una nueva tabla sin NAs
+twins_copia1 <- na.omit(twins)
+
 
 # Definir la interfaz de usuario (UI)
 ui <- dashboardPage(
   dashboardHeader(title = "Gemelos"),
   dashboardSidebar(
     sidebarMenu(
+      menuItem("Introduccion", tabName = "Introduccion", icon = icon("pencil")),
       menuItem("Gráficos", tabName = "graficos", icon = icon("chart-line")),
       menuItem("Reporte", tabName = "Reporte", icon = icon("search"))
     )
   ),
   dashboardBody(
     tabItems(
+      tabItem(
+        tabName = "Introduccion",
+        fluidRow(
+          box(
+            title = "Introduccion",
+            width = 12,
+            verbatimTextOutput("int")
+          )
+        )
+      ),
       tabItem(
         tabName = "graficos",
         sidebarPanel(
@@ -89,7 +117,7 @@ server <- function(input, output) {
   })
   
   # Mostrar la cantidad de variables de tipo carácter
-  output$char_data_count <- renderText({
+  output$int <- renderText({
     paste("Columnas de tipo carácter:", char_variables)
   })
   
@@ -101,8 +129,9 @@ server <- function(input, output) {
           "Registros con información completa:", registros_completos)
   })
   
+  
+  
 }
 
 # Ejecutar la aplicación Shiny
 shinyApp(ui = ui, server = server)
-
