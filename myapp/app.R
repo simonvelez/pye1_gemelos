@@ -20,6 +20,8 @@ num_variables <- ncol(twins)
 num_registros <- nrow(twins)
 num_variables <- ncol(twins)
 
+
+
 #convierte las 16 columnas en numeric 
 twins$DLHRWAGE<- as.numeric(twins$DLHRWAGE)
 twins$DEDUC1<- as.numeric(twins$DEDUC1)
@@ -163,7 +165,8 @@ server <- function(input, output) {
   
   # Mostrar la cantidad de variables de tipo carácter
   output$int <- renderText({
-    paste("Columnas de tipo carácter:", char_variables)
+    paste("numero de variables:", num_variables)
+    
   })
   
   # Mostrar el reporte de datos en la pestaña de reporte
