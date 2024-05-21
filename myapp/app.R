@@ -5,6 +5,8 @@ library(base)
 library(httpuv)
 library(DT)
 library(shinyjs)  # Para usar funciones de JavaScript
+library(ggplot2) #descargar ggplot2 
+
 
 # Cargar los datos de la base de datos
 twins <- read.csv("twins.txt", header = TRUE)
@@ -189,13 +191,12 @@ server <- function(input, output) {
     selected_variable_x_1 <- input$var_x_1
     
     output$dotchart_1 <- renderPlot({
-      dotchart(
-        y = twins$HRWAGEH,
-        x =as.numeric(twins[[selected_variable_x_1]]),
-        main = paste("Dotchart de", selected_variable_x_1),
-        xlab = selected_variable_x_1,
-        ylab = "DLHRWAGE"
-      )
+      ggplot(twins, aes(x = as.numeric(twins[[selected_variable_x_1]]), y = HRWAGEH)) +
+        geom_point(color = "blue") +
+        labs(title = paste("Dotchart de", selected_variable_x_1),
+             x = selected_variable_x_1,
+             y = "HRWAGEH") +
+        theme_minimal()
     })
   })
   
@@ -205,13 +206,12 @@ server <- function(input, output) {
     selected_variable_x_2 <- input$var_x_2
     
     output$dotchart_2 <- renderPlot({
-      dotchart(
-        y = twins$HRWAGEH,
-        x=as.numeric(twins[[selected_variable_x_2]]),
-        main = paste("Dotchart de", selected_variable_x_2),
-        xlab = selected_variable_x_2,
-        ylab = "HRWAGEL"
-      )
+      ggplot(twins, aes(x = as.numeric(twins[[selected_variable_x_2]]), y = HRWAGEL)) +
+        geom_point(color = "red") +
+        labs(title = paste("Dotchart de", selected_variable_x_2),
+             x = selected_variable_x_2,
+             y = "HRWAGEL") +
+        theme_minimal()
     })
   })
   
