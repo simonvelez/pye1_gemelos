@@ -3,6 +3,18 @@ library(shinydashboard)
 library(shinylive)
 library(base)
 library(httpuv)
+library(DT)
+library(shinyjs)  # Para usar funciones de JavaScript
+
+
+
+# Calcular las variables necesarias para el reporte
+num_registros <- nrow(twins)
+num_variables <- ncol(twins)
+
+
+# Seleccionar el archivo XLSX interactivamente
+
 
 # Calcular las variables necesarias para el reporte
 num_registros <- nrow(twins)
@@ -33,6 +45,7 @@ twins_copia1 <- na.omit(twins)
 
 # Definir la interfaz de usuario (UI)
 ui <- dashboardPage(
+  
   dashboardHeader(title = "Gemelos"),
   dashboardSidebar(
     sidebarMenu(
@@ -41,18 +54,30 @@ ui <- dashboardPage(
       menuItem("Reporte", tabName = "Reporte", icon = icon("search"))
     )
   ),
+  
   dashboardBody(
+    useShinyjs(),  # Inicializar shinyjs
     tabItems(
       tabItem(
         tabName = "Introduccion",
+        
+        
         fluidRow(
           box(
-            title = "Introduccion",
+            title = "Introducción",
             width = 12,
-            verbatimTextOutput("int")
+            actionButton("toggleTable", "Mostrar/Ocultar Tabla"),
+            hidden(
+              div(id = "tabla_container",
+                  tableOutput("tabla_twins")
+              )
+            ),
+            verbatimTextOutput("texto_introduccion")
           )
         )
       ),
+      
+        
       tabItem(
         tabName = "graficos",
         sidebarPanel(
@@ -85,6 +110,26 @@ ui <- dashboardPage(
 
 # Definir la lógica del servidor
 server <- function(input, output) {
+  
+  
+  
+  output$tabla_twins <- renderTable({
+    twins_copia1
+  })
+  
+  # Mostrar texto en la pestaña de Introducción
+  output$texto_introduccion <- renderText({
+    "Tabla sin registros incompletos"
+  })
+
+  # Controlar la visibilidad de la tabla
+  observeEvent(input$toggleTable, {
+    toggle("tabla_container")
+  })
+  
+  
+  
+  
   
   # Gráfico 1
   observeEvent(input$plotBtn_1, {
@@ -128,7 +173,6 @@ server <- function(input, output) {
           "Registros con al menos un dato faltante:", char_variables, "\n",
           "Registros con información completa:", registros_completos)
   })
-  
   
   
 }
