@@ -41,6 +41,12 @@ twins$DTEN<- as.numeric(twins$DTEN)
 twins$DMARRIED<- as.numeric(twins$DMARRIED)
 twins$DUNCOV<- as.numeric(twins$DUNCOV)
 
+#calcula las modas
+columna_especifica <- "AGE"
+moda_columna <- as.numeric(names(sort(table(twins[[columna_especifica]]), decreasing = TRUE))[1])
+
+
+
 
 #crear una nueva tabla sin NAs
 twins_copia1 <- na.omit(twins)
@@ -74,6 +80,33 @@ ui <- dashboardPage(
               )
             ),
             verbatimTextOutput("texto_introduccion")
+          ),
+          box(
+            title = "Calcular Moda",
+            width = 12,
+            selectInput("variable_moda", "Seleccionar variable:",
+                        choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV",
+                                    "WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
+            actionButton("calcular_moda", "Calcular Moda"),
+            verbatimTextOutput("moda_resultado")
+          ),
+          box(
+            title = "Calcular Media",
+            width = 12,
+            selectInput("variable_media", "Seleccionar variable:",
+                        choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV",
+                                    "WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
+            actionButton("calcular_media", "Calcular Media"),
+            verbatimTextOutput("media_resultado")
+          ),
+          box(
+            title = "Calcular Mediana",
+            width = 12,
+            selectInput("variable_mediana", "Seleccionar variable:",
+                        choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV",
+                                    "WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
+            actionButton("calcular_mediana", "Calcular Mediana"),
+            verbatimTextOutput("mediana_resultado")
           )
         )
       ),
@@ -190,9 +223,30 @@ server <- function(input, output) {
   output$texto_introduccion <- renderText({
     paste("Número de registros:", nrow(twins), "\n",
           "Número de variables:", ncol(twins), "\n",
-          "Registros con información completa:", nrow(twins_copia1))
+          "Registros con información completa:", nrow(twins_copia1),
+          "moda dato:",moda_columna )
+  })
+  #calcular la moda de la varibale que se selecciona 
+  output$moda_resultado <- renderText({
+    req(input$calcular_moda)
+    variable <- input$variable_moda
+    moda <- as.numeric(names(sort(table(twins_copia1[variable]), decreasing = TRUE))[1])
+    paste("Moda de", variable, ":", moda)
+  })
+  output$media_resultado <- renderText({
+    req(input$calcular_media)
+    variable1 <- input$variable_media
+    media <- mean(twins_copia1[[variable1]], na.rm = TRUE)
+    paste("Media de", variable1, ":", media)
+  })
+  output$mediana_resultado <- renderText({
+    req(input$calcular_mediana)
+    variable2 <- input$variable_mediana
+    mediana <- median(twins_copia1[[variable2]], na.rm = TRUE)
+    paste("Mediana de", variable2, ":", mediana)
   })
 }
+
   
 
 # Ejecutar la aplicación Shiny
