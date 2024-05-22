@@ -204,8 +204,7 @@ server <- function(input, output) {
   output$texto_introduccion <- renderText({
     paste("Número de registros:", nrow(twins), "\n",
           "Número de variables:", ncol(twins), "\n",
-          "Registros con información completa:", nrow(twins_copia1),
-          "moda dato:",moda_columna )
+          "Registros con información completa:", nrow(twins_copia1))
   })
   #calcular la moda de la varibale que se selecciona 
   output$moda_resultado <- renderText({
