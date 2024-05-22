@@ -138,6 +138,8 @@ ui <- dashboardPage(
             box(
               title = "Medidas de Dispersión del Gemelo 1",
               width = 12,
+              selectInput("variable_gemelo1", "Seleccionar variable:",
+                          choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH", "DMARRIED", "DUNCOV")),
               uiOutput("dispersion_gemelo1")
             )
           ),
@@ -146,6 +148,8 @@ ui <- dashboardPage(
             box(
               title = "Medidas de Dispersión del Gemelo 2",
               width = 12,
+              selectInput("variable_gemelo2", "Seleccionar variable:",
+                          choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
               uiOutput("dispersion_gemelo2")
             )
           )
@@ -154,6 +158,7 @@ ui <- dashboardPage(
     )
   )
 )
+      
 # Definir la lógica del servidor
 server <- function(input, output) {
   # Leer archivo de Excel y preparar los datos
@@ -231,33 +236,34 @@ server <- function(input, output) {
   })
   
   # Calcular medidas de dispersión para gemelo 1
-  output$dispersion_gemelo1 <- renderUI({
-    variables_gemelo1 <- c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH", "DMARRIED", "DUNCOV")
-    dispersion_list <- lapply(variables_gemelo1, function(var) {
-      dispersion_result <- twins_copia1[[var]]
-      dispersion <- sprintf("Dispersión de %s: %f", var, sd(dispersion_result, na.rm = TRUE))
-      rango <- sprintf("Rango de %s: %f", var, diff(range(dispersion_result, na.rm = TRUE)))
-      varianza <- sprintf("Varianza de %s: %f", var, var(dispersion_result, na.rm = TRUE))
-      desviacion_estandar <- sprintf("Desviación Estándar de %s: %f", var, sd(dispersion_result, na.rm = TRUE))
-      coeficiente_variacion <- sprintf("Coeficiente de Variación de %s: %f", var, sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE))
-      HTML(paste(dispersion, rango, varianza, desviacion_estandar, coeficiente_variacion, sep = "<br>"))
-    })
-    do.call(tagList, dispersion_list)
+  output$dispersion_gemelo1 <- renderText({
+    req(input$variable_gemelo1)
+    var <- input$variable_gemelo1
+    dispersion_result <- twins_copia1[[var]]
+    
+    dispersion <- sprintf("Dispersión: %f", sd(dispersion_result, na.rm = TRUE))
+    rango <- sprintf("Rango: %f", diff(range(dispersion_result, na.rm = TRUE)))
+    varianza <- sprintf("Varianza: %f", var(dispersion_result, na.rm = TRUE))
+    desviacion_estandar <- sprintf("Desviación Estándar: %f", sd(dispersion_result, na.rm = TRUE))
+    coeficiente_variacion <- sprintf("Coeficiente de Variación: %f", sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE))
+    
+    paste(dispersion, rango, varianza, desviacion_estandar, coeficiente_variacion, sep = "\n")
   })
   
+  
   # Calcular medidas de dispersión para gemelo 2
-  output$dispersion_gemelo2 <- renderUI({
-    variables_gemelo2 <- c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")
-    dispersion_list <- lapply(variables_gemelo2, function(var) {
-      dispersion_result <- twins_copia1[[var]]
-      dispersion <- sprintf("Dispersión de %s: %f", var, sd(dispersion_result, na.rm = TRUE))
-      rango <- sprintf("Rango de %s: %f", var, diff(range(dispersion_result, na.rm = TRUE)))
-      varianza <- sprintf("Varianza de %s: %f", var, var(dispersion_result, na.rm = TRUE))
-      desviacion_estandar <- sprintf("Desviación Estándar de %s: %f", var, sd(dispersion_result, na.rm = TRUE))
-      coeficiente_variacion <- sprintf("Coeficiente de Variación de %s: %f", var, sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE))
-      HTML(paste(dispersion, rango, varianza, desviacion_estandar, coeficiente_variacion, sep = "<br>"))
-    })
-    do.call(tagList, dispersion_list)
+  output$dispersion_gemelo2 <- renderText({
+    req(input$variable_gemelo2)
+    var <- input$variable_gemelo2
+    dispersion_result <- twins_copia1[[var]]
+    
+    dispersion <- sprintf("Dispersión: %f", sd(dispersion_result, na.rm = TRUE))
+    rango <- sprintf("Rango: %f", diff(range(dispersion_result, na.rm = TRUE)))
+    varianza <- sprintf("Varianza: %f", var(dispersion_result, na.rm = TRUE))
+    desviacion_estandar <- sprintf("Desviación Estándar: %f", sd(dispersion_result, na.rm = TRUE))
+    coeficiente_variacion <- sprintf("Coeficiente de Variación: %f", sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE))
+    
+    paste(dispersion, rango, varianza, desviacion_estandar, coeficiente_variacion, sep = "\n")
   })
   
   #calcular la moda de la varibale que se selecciona 
