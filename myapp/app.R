@@ -51,7 +51,7 @@ ui <- dashboardPage(
       menuItem("Introduccion", tabName = "Introduccion", icon = icon("pencil")),
       menuItem("Gráficos", tabName = "graficos", icon = icon("chart-line")),
       menuItem("Reporte", tabName = "Reporte", icon = icon("search")),
-      menuItem("Análisis", tabName = "analysis", icon = icon("chart-bar"))
+      menuItem("Análisis", tabName = "analisis", icon = icon("chart-bar"))
     
       )
   ),
@@ -73,33 +73,58 @@ ui <- dashboardPage(
             ),
             verbatimTextOutput("texto_introduccion")
           ),
+          fluidRow(
           box(
-            title = "Calcular Moda",
-            width = 12,
+            title = "Calcular Moda gemelo 1 ",
+            width = 4,
             selectInput("variable_moda", "Seleccionar variable:",
-                        choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV",
-                                    "WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
+                        choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV")),
             actionButton("calcular_moda", "Calcular Moda"),
             verbatimTextOutput("moda_resultado")
           ),
           box(
-            title = "Calcular Media",
-            width = 12,
+            title = "Calcular Media gemelo 1",
+            width = 4,
             selectInput("variable_media", "Seleccionar variable:",
-                        choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV",
-                                    "WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
+                        choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV")),
             actionButton("calcular_media", "Calcular Media"),
             verbatimTextOutput("media_resultado")
           ),
           box(
-            title = "Calcular Mediana",
-            width = 12,
+            title = "Calcular Mediana gemelo 1",
+            width = 4,
             selectInput("variable_mediana", "Seleccionar variable:",
-                        choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV",
-                                    "WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
+                        choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV")),
+            actionButton("calcular_mediana", "Calcular Mediana"),
+            verbatimTextOutput("mediana_resultado")
+          ),
+        ),
+        fluidRow(
+          box(
+            title = "Calcular Moda gemelo 2 ",
+            width = 4,
+            selectInput("variable_moda", "Seleccionar variable:",
+                        choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
+            actionButton("calcular_moda", "Calcular Moda"),
+            verbatimTextOutput("moda_resultado")
+          ),
+          box(
+            title = "Calcular Media gemelo 2",
+            width = 4,
+            selectInput("variable_media", "Seleccionar variable:",
+                        choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
+            actionButton("calcular_media", "Calcular Media"),
+            verbatimTextOutput("media_resultado")
+          ),
+          box(
+            title = "Calcular Mediana gemelo 2",
+            width = 4,
+            selectInput("variable_mediana", "Seleccionar variable:",
+                        choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
             actionButton("calcular_mediana", "Calcular Mediana"),
             verbatimTextOutput("mediana_resultado")
           )
+        )
         )
       ),
       
@@ -131,7 +156,7 @@ ui <- dashboardPage(
         )
       ),
       tabItem(
-        tabName = "analysis",
+        tabName = "analisis",
         fluidRow(
           column(
             width = 6,
@@ -291,3 +316,4 @@ server <- function(input, output) {
 
 # Ejecutar la aplicación Shiny
 shinyApp(ui = ui, server = server)
+
