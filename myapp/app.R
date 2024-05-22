@@ -50,8 +50,10 @@ ui <- dashboardPage(
     sidebarMenu(
       menuItem("Introduccion", tabName = "Introduccion", icon = icon("pencil")),
       menuItem("Gráficos", tabName = "graficos", icon = icon("chart-line")),
-      menuItem("Reporte", tabName = "Reporte", icon = icon("search"))
-    )
+      menuItem("Reporte", tabName = "Reporte", icon = icon("search")),
+      menuItem("Análisis", tabName = "analysis", icon = icon("chart-bar"))
+    
+      )
   ),
   
   dashboardBody(
@@ -125,6 +127,19 @@ ui <- dashboardPage(
             title = "Reporte de Datos",
             width = 12,
             verbatimTextOutput("reporte")
+          )
+        )
+      ),
+      tabItem(
+        tabName = "analysis",
+        fluidRow(
+          box(
+            title = "Calcular Medidas de Dispersión",
+            width = 12,
+            selectInput("variable_dispersion", "Seleccionar variable:",
+                        choices = colnames(twins_copia1)),
+            actionButton("calcular_dispersion", "Calcular Medidas de Dispersión"),
+            textOutput("dispersion_resultado")
           )
         )
       )
@@ -207,6 +222,24 @@ server <- function(input, output) {
           "Registros con información completa:", nrow(twins_copia1), "\n",
           "Registros con información incompleta:",nrow(twins)-nrow(twins_copia1))
   })
+  
+  # Calcular medidas de dispersión
+  observeEvent(input$calcular_dispersion, {
+    req(input$variable_dispersion)
+    variable <- input$variable_dispersion
+    dispersion_result <- twins_copia1[[variable]]
+    
+    dispersion <- sprintf("Dispersión: %f", sd(dispersion_result, na.rm = TRUE))
+    rango <- sprintf("Rango: %f", diff(range(dispersion_result, na.rm = TRUE)))
+    varianza <- sprintf("Varianza: %f", var(dispersion_result, na.rm = TRUE))
+    desviacion_estandar <- sprintf("Desviación Estándar: %f", sd(dispersion_result, na.rm = TRUE))
+    coeficiente_variacion <- sprintf("Coeficiente de Variación: %f", sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE))
+    
+    output$dispersion_resultado <- renderText({
+      paste(dispersion, rango, varianza, desviacion_estandar, coeficiente_variacion, sep = "\n")
+    })
+  })
+  
   #calcular la moda de la varibale que se selecciona 
   output$moda_resultado <- renderText({
     req(input$calcular_moda)
