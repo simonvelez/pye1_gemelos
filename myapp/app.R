@@ -133,20 +133,27 @@ ui <- dashboardPage(
       tabItem(
         tabName = "analysis",
         fluidRow(
-          box(
-            title = "Calcular Medidas de Dispersión",
-            width = 12,
-            selectInput("variable_dispersion", "Seleccionar variable:",
-                        choices = colnames(twins_copia1)),
-            actionButton("calcular_dispersion", "Calcular Medidas de Dispersión"),
-            textOutput("dispersion_resultado")
+          column(
+            width = 6,
+            box(
+              title = "Medidas de Dispersión del Gemelo 1",
+              width = 12,
+              uiOutput("dispersion_gemelo1")
+            )
+          ),
+          column(
+            width = 6,
+            box(
+              title = "Medidas de Dispersión del Gemelo 2",
+              width = 12,
+              uiOutput("dispersion_gemelo2")
+            )
           )
         )
       )
     )
   )
 )
-
 # Definir la lógica del servidor
 server <- function(input, output) {
   # Leer archivo de Excel y preparar los datos
@@ -223,21 +230,34 @@ server <- function(input, output) {
           "Registros con información incompleta:",nrow(twins)-nrow(twins_copia1))
   })
   
-  # Calcular medidas de dispersión
-  observeEvent(input$calcular_dispersion, {
-    req(input$variable_dispersion)
-    variable <- input$variable_dispersion
-    dispersion_result <- twins_copia1[[variable]]
-    
-    dispersion <- sprintf("Dispersión: %f", sd(dispersion_result, na.rm = TRUE))
-    rango <- sprintf("Rango: %f", diff(range(dispersion_result, na.rm = TRUE)))
-    varianza <- sprintf("Varianza: %f", var(dispersion_result, na.rm = TRUE))
-    desviacion_estandar <- sprintf("Desviación Estándar: %f", sd(dispersion_result, na.rm = TRUE))
-    coeficiente_variacion <- sprintf("Coeficiente de Variación: %f", sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE))
-    
-    output$dispersion_resultado <- renderText({
-      paste(dispersion, rango, varianza, desviacion_estandar, coeficiente_variacion, sep = "\n")
+  # Calcular medidas de dispersión para gemelo 1
+  output$dispersion_gemelo1 <- renderUI({
+    variables_gemelo1 <- c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH", "DMARRIED", "DUNCOV")
+    dispersion_list <- lapply(variables_gemelo1, function(var) {
+      dispersion_result <- twins_copia1[[var]]
+      dispersion <- sprintf("Dispersión de %s: %f", var, sd(dispersion_result, na.rm = TRUE))
+      rango <- sprintf("Rango de %s: %f", var, diff(range(dispersion_result, na.rm = TRUE)))
+      varianza <- sprintf("Varianza de %s: %f", var, var(dispersion_result, na.rm = TRUE))
+      desviacion_estandar <- sprintf("Desviación Estándar de %s: %f", var, sd(dispersion_result, na.rm = TRUE))
+      coeficiente_variacion <- sprintf("Coeficiente de Variación de %s: %f", var, sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE))
+      HTML(paste(dispersion, rango, varianza, desviacion_estandar, coeficiente_variacion, sep = "<br>"))
     })
+    do.call(tagList, dispersion_list)
+  })
+  
+  # Calcular medidas de dispersión para gemelo 2
+  output$dispersion_gemelo2 <- renderUI({
+    variables_gemelo2 <- c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")
+    dispersion_list <- lapply(variables_gemelo2, function(var) {
+      dispersion_result <- twins_copia1[[var]]
+      dispersion <- sprintf("Dispersión de %s: %f", var, sd(dispersion_result, na.rm = TRUE))
+      rango <- sprintf("Rango de %s: %f", var, diff(range(dispersion_result, na.rm = TRUE)))
+      varianza <- sprintf("Varianza de %s: %f", var, var(dispersion_result, na.rm = TRUE))
+      desviacion_estandar <- sprintf("Desviación Estándar de %s: %f", var, sd(dispersion_result, na.rm = TRUE))
+      coeficiente_variacion <- sprintf("Coeficiente de Variación de %s: %f", var, sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE))
+      HTML(paste(dispersion, rango, varianza, desviacion_estandar, coeficiente_variacion, sep = "<br>"))
+    })
+    do.call(tagList, dispersion_list)
   })
   
   #calcular la moda de la varibale que se selecciona 
