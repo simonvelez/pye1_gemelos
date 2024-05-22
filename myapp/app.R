@@ -131,15 +131,6 @@ ui <- dashboardPage(
         
       tabItem(
         tabName = "graficos",
-        sidebarPanel(
-          selectInput("var_x_1", " gemelo 1:",
-                      choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV")),
-          actionButton("plotBtn_1", "Generar Gráfico"),
-          
-          selectInput("var_x_2", " gemelo 2:",
-                      choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
-          actionButton("plotBtn_2", "Generar Gráfico")
-        ),
         mainPanel(
           plotOutput("dotchart_1"),
           plotOutput("dotchart_2")
@@ -217,33 +208,18 @@ server <- function(input, output) {
   
   
   # Gráfico 1
-  observeEvent(input$plotBtn_1, {
-    req(input$var_x_1)
-    selected_variable_x_1 <- input$var_x_1
-    
-    output$dotchart_1 <- renderPlot({
-      ggplot(twins_copia1, aes_string(x = selected_variable_x_1, y = "HRWAGEH")) +
-        geom_point(color = "blue") +
-        labs(title = paste("Dotchart de", selected_variable_x_1),
-             x = selected_variable_x_1,
-             y = "HRWAGEH") +
-        theme_minimal()
-    })
+  output$dotchart_1 <- renderPlot({
+    ggplot(twins_copia1, aes(x = EDUCH, y = HRWAGEH)) +
+      geom_point(color = "blue") +
+      labs(title = "Dotchart de EDUCH vs HRWAGEH", x = "EDUCH", y = "HRWAGEH") +
+      theme_minimal()
   })
   
-  #Gráfico 2
-  observeEvent(input$plotBtn_2, {
-    req(input$var_x_2)
-    selected_variable_x_2 <- input$var_x_2
-    
-    output$dotchart_2 <- renderPlot({
-      ggplot(twins_copia1, aes_string(x = selected_variable_x_2, y = "HRWAGEL")) +
-        geom_point(color = "red") +
-        labs(title = paste("Dotchart de", selected_variable_x_2),
-             x = selected_variable_x_2,
-             y = "HRWAGEL") +
-        theme_minimal()
-    })
+  output$dotchart_2 <- renderPlot({
+    ggplot(twins_copia1, aes(x = EDUCL, y = HRWAGEL)) +
+      geom_point(color = "red") +
+      labs(title = "Dotchart de EDUCL vs HRWAGEL", x = "EDUCL", y = "HRWAGEL") +
+      theme_minimal()
   })
   
   # Mostrar la cantidad de variables de tipo carácter
