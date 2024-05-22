@@ -12,17 +12,8 @@ library(ggplot2) #descargar ggplot2
 twins <- read.csv("twins.txt", header = TRUE)
 
 # Calcular las variables necesarias para el reporte
-num_registros <- nrow(twins)
-num_variables <- ncol(twins)
-
-
-# Seleccionar el archivo XLSX interactivamente
-
-
-# Calcular las variables necesarias para el reporte
-num_registros <- nrow(twins)
-num_variables <- ncol(twins)
-
+num_registros <- nrow(twins)#registros en la base original
+num_variables <- ncol(twins)#variables
 
 
 #convierte las 16 columnas en numeric 
@@ -47,17 +38,13 @@ twins$DUNCOV<- as.numeric(twins$DUNCOV)
 columna_especifica <- "AGE"
 moda_columna <- as.numeric(names(sort(table(twins[[columna_especifica]]), decreasing = TRUE))[1])
 
-
-
-
 #crear una nueva tabla sin NAs
-twins_copia1 <- na.omit(twins)
-
+twins_copia1 <- na.omit(twins) # datos con registros completos
 
 # Definir la interfaz de usuario (UI)
 ui <- dashboardPage(
   
-  dashboardHeader(title = "Gemelos"),
+  dashboardHeader(title = "Estudio gemelos"),
   dashboardSidebar(
     sidebarMenu(
       menuItem("Introduccion", tabName = "Introduccion", icon = icon("pencil")),
