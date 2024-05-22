@@ -1,8 +1,8 @@
-library(shiny)
+#library(shiny)
 library(shinydashboard)
-library(shinylive)
-library(base)
-library(httpuv)
+#library(shinylive)
+#library(base)
+#library(httpuv)
 library(DT)
 library(shinyjs)  # Para usar funciones de JavaScript
 library(ggplot2) #descargar ggplot2 
@@ -40,6 +40,7 @@ moda_columna <- as.numeric(names(sort(table(twins[[columna_especifica]]), decrea
 
 #crear una nueva tabla sin NAs
 twins_copia1 <- na.omit(twins) # datos con registros completos
+
 
 # Definir la interfaz de usuario (UI)
 ui <- dashboardPage(
@@ -104,13 +105,13 @@ ui <- dashboardPage(
       tabItem(
         tabName = "graficos",
         sidebarPanel(
-          selectInput("var_x_1", "Seleccionar variable para el eje Y, para el gemelo 1:",
+          selectInput("var_x_1", " gemelo 1:",
                       choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV")),
-          actionButton("plotBtn_1", "Generar Gráfico gemelo 1"),
+          actionButton("plotBtn_1", "Generar Gráfico"),
           
-          selectInput("var_x_2", "Seleccionar variable para el eje Y, para el gemelo 2:",
+          selectInput("var_x_2", " gemelo 2:",
                       choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
-          actionButton("plotBtn_2", "Generar Gráfico gemelo 2")
+          actionButton("plotBtn_2", "Generar Gráfico")
         ),
         mainPanel(
           plotOutput("dotchart_1"),
@@ -136,22 +137,16 @@ server <- function(input, output) {
   # Leer archivo de Excel y preparar los datos
   data <- eventReactive(input$file, {
     req(input$file)
-    
-    # Leer los datos del archivo de Excel
-    twins <- read_excel(input$file$datapath)
-    
+ 
     # Convertir las columnas a numérico
     cols_to_convert <- c("DLHRWAGE", "DEDUC1", "AGE", "AGESQ", "HRWAGEH", "WHITEH", "MALEH", 
                          "EDUCH", "HRWAGEL", "WHITEL", "MALEL", "EDUCL", "DEDUC2", "DTEN", 
                          "DMARRIED", "DUNCOV")
     twins[cols_to_convert] <- lapply(twins[cols_to_convert], as.numeric)
     
-    # Crear una nueva tabla sin NAs
-    twins_copia1 <- na.omit(twins)
-    
+  
     list(original = twins, copia1 = twins_copia1)
   })
-  
   
   
   output$tabla_twins <- renderTable({
@@ -169,16 +164,13 @@ server <- function(input, output) {
   })
   
   
-  
-  
-  
   # Gráfico 1
   observeEvent(input$plotBtn_1, {
     req(input$var_x_1)
     selected_variable_x_1 <- input$var_x_1
     
     output$dotchart_1 <- renderPlot({
-      ggplot(twins, aes(x = as.numeric(twins[[selected_variable_x_1]]), y = HRWAGEH)) +
+      ggplot(twins_copia1, aes_string(x = selected_variable_x_1, y = "HRWAGEH")) +
         geom_point(color = "blue") +
         labs(title = paste("Dotchart de", selected_variable_x_1),
              x = selected_variable_x_1,
@@ -187,13 +179,13 @@ server <- function(input, output) {
     })
   })
   
-  # Gráfico 2
+  #Gráfico 2
   observeEvent(input$plotBtn_2, {
     req(input$var_x_2)
     selected_variable_x_2 <- input$var_x_2
     
     output$dotchart_2 <- renderPlot({
-      ggplot(twins, aes(x = as.numeric(twins[[selected_variable_x_2]]), y = HRWAGEL)) +
+      ggplot(twins_copia1, aes_string(x = selected_variable_x_2, y = "HRWAGEL")) +
         geom_point(color = "red") +
         labs(title = paste("Dotchart de", selected_variable_x_2),
              x = selected_variable_x_2,
