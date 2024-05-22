@@ -74,57 +74,57 @@ ui <- dashboardPage(
             verbatimTextOutput("texto_introduccion")
           ),
           fluidRow(
-          box(
-            title = "Calcular Moda gemelo 1 ",
-            width = 4,
-            selectInput("variable_moda", "Seleccionar variable:",
-                        choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV")),
-            actionButton("calcular_moda", "Calcular Moda"),
-            verbatimTextOutput("moda_resultado")
+            box(
+              title = "Calcular Moda gemelo 1 ",
+              width = 4,
+              selectInput("variable_moda_1", "Seleccionar variable:",
+                          choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV")),
+              actionButton("calcular_moda_1", "Calcular Moda"),
+              verbatimTextOutput("moda_resultado_1")
+            ),
+            box(
+              title = "Calcular Media gemelo 1",
+              width = 4,
+              selectInput("variable_media_1", "Seleccionar variable:",
+                          choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV")),
+              actionButton("calcular_media_1", "Calcular Media"),
+              verbatimTextOutput("media_resultado_1")
+            ),
+            box(
+              title = "Calcular Mediana gemelo 1",
+              width = 4,
+              selectInput("variable_mediana_1", "Seleccionar variable:",
+                          choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV")),
+              actionButton("calcular_mediana_1", "Calcular Mediana"),
+              verbatimTextOutput("mediana_resultado_1")
+            ),
           ),
-          box(
-            title = "Calcular Media gemelo 1",
-            width = 4,
-            selectInput("variable_media", "Seleccionar variable:",
-                        choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV")),
-            actionButton("calcular_media", "Calcular Media"),
-            verbatimTextOutput("media_resultado")
-          ),
-          box(
-            title = "Calcular Mediana gemelo 1",
-            width = 4,
-            selectInput("variable_mediana", "Seleccionar variable:",
-                        choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV")),
-            actionButton("calcular_mediana", "Calcular Mediana"),
-            verbatimTextOutput("mediana_resultado")
-          ),
-        ),
-        fluidRow(
-          box(
-            title = "Calcular Moda gemelo 2 ",
-            width = 4,
-            selectInput("variable_moda", "Seleccionar variable:",
-                        choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
-            actionButton("calcular_moda", "Calcular Moda"),
-            verbatimTextOutput("moda_resultado")
-          ),
-          box(
-            title = "Calcular Media gemelo 2",
-            width = 4,
-            selectInput("variable_media", "Seleccionar variable:",
-                        choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
-            actionButton("calcular_media", "Calcular Media"),
-            verbatimTextOutput("media_resultado")
-          ),
-          box(
-            title = "Calcular Mediana gemelo 2",
-            width = 4,
-            selectInput("variable_mediana", "Seleccionar variable:",
-                        choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
-            actionButton("calcular_mediana", "Calcular Mediana"),
-            verbatimTextOutput("mediana_resultado")
+          fluidRow(
+            box(
+              title = "Calcular Moda gemelo 2 ",
+              width = 4,
+              selectInput("variable_moda_2", "Seleccionar variable:",
+                          choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
+              actionButton("calcular_moda_2", "Calcular Moda"),
+              verbatimTextOutput("moda_resultado_2")
+            ),
+            box(
+              title = "Calcular Media gemelo 2",
+              width = 4,
+              selectInput("variable_media_2", "Seleccionar variable:",
+                          choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
+              actionButton("calcular_media_2", "Calcular Media"),
+              verbatimTextOutput("media_resultado_2")
+            ),
+            box(
+              title = "Calcular Mediana gemelo 2",
+              width = 4,
+              selectInput("variable_mediana_2", "Seleccionar variable:",
+                          choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
+              actionButton("calcular_mediana_2", "Calcular Mediana"),
+              verbatimTextOutput("mediana_resultado_2")
+            )
           )
-        )
         )
       ),
       
@@ -291,29 +291,57 @@ server <- function(input, output) {
     paste(dispersion, rango, varianza, desviacion_estandar, coeficiente_variacion, sep = "\n")
   })
   
-  #calcular la moda de la varibale que se selecciona 
-  output$moda_resultado <- renderText({
-    req(input$calcular_moda)
-    variable <- input$variable_moda
+  
+# moda para el gemelo 1   
+  output$moda_resultado_1 <- renderText({
+    req(input$calcular_moda_1)
+    variable <- input$variable_moda_1
     moda <- as.numeric(names(sort(table(twins_copia1[variable]), decreasing = TRUE))[1])
     paste("Moda de", variable, ":", moda)
   })
-  output$media_resultado <- renderText({
-    req(input$calcular_media)
-    variable1 <- input$variable_media
+# media para el gemelo 1
+  output$media_resultado_1 <- renderText({
+    req(input$calcular_media_1)
+    variable1 <- input$variable_media_1
     media <- mean(twins_copia1[[variable1]], na.rm = TRUE)
     paste("Media de", variable1, ":", media)
   })
-  output$mediana_resultado <- renderText({
-    req(input$calcular_mediana)
-    variable2 <- input$variable_mediana
+  
+#mediana para el gemelo 1
+  output$mediana_resultado_1 <- renderText({
+    req(input$calcular_mediana_1)
+    variable2 <- input$variable_mediana_1
     mediana <- median(twins_copia1[[variable2]], na.rm = TRUE)
     paste("Mediana de", variable2, ":", mediana)
   })
-}
+  
+#moda para el gemelo 2
+  output$moda_resultado_2 <- renderText({
+    req(input$calcular_moda_2)
+    variable <- input$variable_moda_2
+    moda <- as.numeric(names(sort(table(twins_copia1[variable]), decreasing = TRUE))[1])
+    paste("Moda de", variable, ":", moda)
+  })
+  
+#media para el gemelo 2
+  output$media_resultado_2 <- renderText({
+    req(input$calcular_media_2)
+    variable1 <- input$variable_media_2
+    media <- mean(twins_copia1[[variable1]], na.rm = TRUE)
+    paste("Media de", variable1, ":", media)
+  })
+#mediana para el gemelo 2
+  output$mediana_resultado_2 <- renderText({
+    req(input$calcular_mediana_2)
+    variable2 <- input$variable_mediana_2
+    mediana <- median(twins_copia1[[variable2]], na.rm = TRUE)
+    paste("Mediana de", variable2, ":", mediana)
+  })
 
+}
   
 
 # Ejecutar la aplicación Shiny
 shinyApp(ui = ui, server = server)
+
 
