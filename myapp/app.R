@@ -1,12 +1,7 @@
-#library(shiny)
-library(shinydashboard)
-#library(shinylive)
-#library(base)
-#library(httpuv)
-library(DT)
+library(shinydashboard) # Estructura de la página
 library(shinyjs)  # Para usar funciones de JavaScript
-library(ggplot2) #descargar ggplot2 
-
+library(ggplot2) # Crear gráficos y ponerlos bonitos
+library(dplyr) 
 
 # Cargar los datos de la base de datos
 twins <- read.csv("twins.txt", header = TRUE)
@@ -208,18 +203,24 @@ server <- function(input, output) {
   
   
   # Gráfico 1
+  
   output$dotchart_1 <- renderPlot({
-    ggplot(twins_copia1, aes(x = EDUCL, y = HRWAGEL)) +
-      geom_point(color = "blue") +
-      labs(title = "Dotchart de EDUCH vs HRWAGEH", x = "Años de educación en dólares", y = "Salario") +
-      theme_minimal()
+    ggplot(twins_copia1, aes(x = EDUCL, y = HRWAGEL)) + #Se usa para crear el dotchart
+      geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, color = "blue") +
+      labs(title = "Dotchart de EDUCH vs HRWAGEH", x = "Años de educación", y = "Salario en dólares") +
+      theme_minimal() + stat_summary(fun.y=mean, geom="point", shape=18,
+                                     size=3, color="red")
   })
+  #grafico 2
+  
+  
   
   output$dotchart_2 <- renderPlot({
     ggplot(twins_copia1, aes(x = EDUCH, y = HRWAGEH)) +
-      geom_point(color = "red") +
-      labs(title = "Dotchart de EDUCL vs HRWAGEL", x = "Años de educación en dólares", y = "Salario") +
+      geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "red") +
+      labs(title = "Dotchart de EDUCL vs HRWAGEL", x = "Años de educación", y = "Salario  en dólares") +
       theme_minimal()
+    
   })
   
   # Mostrar la cantidad de variables de tipo carácter

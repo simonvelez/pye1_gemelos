@@ -2,6 +2,10 @@
 # github pages. SOLO DEBE EJECUTARSE UNA VEZ. Si se quiere correr la app en shiny,
 # ir a myapp/app.R.
 
+library(shinylive)
+library(httpuv)
+
+
 # Exporta la app (debe llamarse app.R) en myapp a docs
 shinylive::export(appdir = "myapp", destdir = "docs")
 
