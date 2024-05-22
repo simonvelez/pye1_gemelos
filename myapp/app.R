@@ -209,16 +209,16 @@ server <- function(input, output) {
   
   # Gráfico 1
   output$dotchart_1 <- renderPlot({
-    ggplot(twins_copia1, aes(x = EDUCH, y = HRWAGEH)) +
+    ggplot(twins_copia1, aes(x = EDUCL, y = HRWAGEL)) +
       geom_point(color = "blue") +
-      labs(title = "Dotchart de EDUCH vs HRWAGEH", x = "EDUCH", y = "HRWAGEH") +
+      labs(title = "Dotchart de EDUCH vs HRWAGEH", x = "Años de educación en dólares", y = "Salario") +
       theme_minimal()
   })
   
   output$dotchart_2 <- renderPlot({
-    ggplot(twins_copia1, aes(x = EDUCL, y = HRWAGEL)) +
+    ggplot(twins_copia1, aes(x = EDUCH, y = HRWAGEH)) +
       geom_point(color = "red") +
-      labs(title = "Dotchart de EDUCL vs HRWAGEL", x = "EDUCL", y = "HRWAGEL") +
+      labs(title = "Dotchart de EDUCL vs HRWAGEL", x = "Años de educación en dólares", y = "Salario") +
       theme_minimal()
   })
   
