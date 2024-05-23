@@ -52,8 +52,7 @@ ui <- dashboardPage(
     sidebarMenu(
       menuItem("Introduccion", tabName = "Introduccion", icon = icon("pencil")),
       menuItem("Gráficos", tabName = "graficos", icon = icon("chart-line")),
-      menuItem("Reporte", tabName = "Reporte", icon = icon("search")),
-      menuItem("Análisis", tabName = "analisis", icon = icon("chart-bar"))
+      menuItem("Resumen De Estaísticos", tabName = "analisis", icon = icon("chart-bar"))
     )
   ),
   
@@ -135,16 +134,6 @@ ui <- dashboardPage(
           plotOutput("dotchart_2"),
           plotOutput("dotchart_discretizado_gemelo1"),
           plotOutput("dotchart_discretizado_gemelo2") 
-        )
-      ),
-      tabItem(
-        tabName = "Reporte",
-        fluidRow(
-          box(
-            title = "Reporte de Datos",
-            width = 12,
-            verbatimTextOutput("reporte")
-          )
         )
       ),
       tabItem(
