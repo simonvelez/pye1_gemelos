@@ -207,15 +207,24 @@ server <- function(input, output) {
     ggplot(twins_comp, aes(x = EDUCH_disc, y = HRWAGEH)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "purple") +
       labs(title = "Dotchart Discretizado de EDUCH vs HRWAGEH", x = "Años de educación (Discretizado)", y = "Salario en dólares") +
-      theme_minimal()+stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "red")
+      theme_minimal() +
+      stat_summary(fun.data=data_summary, color="red")
   })
+  
+  data_summary <- function(x) {
+    m <- mean(x)
+    ymin <- m-sd(x)
+    ymax <- m+sd(x)
+    return(c(y=m,ymin=ymin,ymax=ymax))
+  }
   
   # grafico discretizado gemelo 1
   output$dotchart_discretizado_gemelo1 <- renderPlot({
     ggplot(twins_comp, aes(x = EDUCL_disc, y = HRWAGEL)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "green") +
       labs(title = "Dotchart Discretizado de EDUCH vs HRWAGEH", x = "Años de educación (Discretizado)", y = "Salario en dólares") +
-      theme_minimal()+stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "red")
+      theme_minimal()+
+      stat_summary(fun.data=data_summary, color="blue")
   })
   
   # Calcular medidas de dispersión para gemelo 1
