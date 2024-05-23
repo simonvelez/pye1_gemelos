@@ -21,7 +21,7 @@ twins[cols_to_convert] <- lapply(twins[cols_to_convert], as.numeric)
 twins_comp <- na.omit(twins) # datos con registros completos
 
 #calcular la dimension de la tabla
-dim_datos<- paste("Número de filas:", dim(twins)[1], "\nNúmero de columnas:", dim(twins)[2])
+dim_datos<- paste("Número de filas:", dim(twins_comp)[1], "\nNúmero de columnas:", dim(twins_comp)[2])
 
 # Seleccionar solo las columnas útiles para el proyecto
 twins_comp %>%
