@@ -52,7 +52,7 @@ ui <- dashboardPage(
     sidebarMenu(
       menuItem("Introduccion", tabName = "Introduccion", icon = icon("pencil")),
       menuItem("Gráficos", tabName = "graficos", icon = icon("chart-line")),
-      menuItem("Resumen De Estaísticos", tabName = "analisis", icon = icon("chart-bar"))
+      menuItem("Resumen De Estadísticos", tabName = "analisis", icon = icon("chart-bar"))
     )
   ),
   
@@ -129,11 +129,29 @@ ui <- dashboardPage(
       ),
       tabItem(
         tabName = "graficos",
-        mainPanel(
-          plotOutput("dotchart_1"),
-          plotOutput("dotchart_2"),
-          plotOutput("dotchart_discretizado_gemelo1"),
-          plotOutput("dotchart_discretizado_gemelo2") 
+        fluidRow(
+          box(
+            title = "Gráficos Discretizados",
+            width = 6,
+            actionButton("botongraficosdiscretizados", "Mostrar/Ocultar Gráficos Discretizados"),
+            hidden(
+              div(id = "graficas_discretizadas",
+                  plotOutput("dotchart_discretizado_gemelo1"),
+                  plotOutput("dotchart_discretizado_gemelo2")
+              )
+            )
+          ),
+          box(
+            title = "Gráficos sin Discretizar",
+            width = 6,
+            actionButton("botongraficos", "Mostrar/Ocultar Gráficos Continuos"),
+            hidden(
+              div(id = "graficos_sindiscretizar",
+                  plotOutput("dotchart_1"),
+                  plotOutput("dotchart_2")
+              )
+            )
+          )
         )
       ),
       tabItem(
@@ -184,6 +202,16 @@ server <- function(input, output) {
   # Controlar la visibilidad de la tabla
   observeEvent(input$toggleTable, {
     toggle("tabla_container")
+  })
+  
+  # Controlar la visibilidad de las gráficas sin discretizar
+  observeEvent(input$botongraficos, {
+    toggle("graficos_sindiscretizar")
+  })
+  
+  # Controlar la visibilidad de las gráficas discretizadas
+  observeEvent(input$botongraficosdiscretizados, {
+    toggle("graficas_discretizadas")
   })
   
   # Gráfico 1
@@ -251,8 +279,8 @@ server <- function(input, output) {
   # Mostrar cuartiles para gemelo 1
   output$cuartiles_gemelo1 <- renderText({
     req(input$variable_gemelo1)
-    var <- input$variable_gemelo1
-    stats <- summary_stats(twins_comp, var)
+    variable_gemelo1 <- input$variable_gemelo1
+    stats <- summary_stats(twins_comp, variable_gemelo1)
     
     paste("Mínimo:", stats$Min, "Q1:", stats$Q1,"Q2:", stats$Median,"Q3:", stats$Q3, 
           "Máximo:", stats$Max, sep = "\n")
@@ -261,8 +289,8 @@ server <- function(input, output) {
   # Mostrar cuartiles para gemelo 2
   output$cuartiles_gemelo2 <- renderText({
     req(input$variable_gemelo2)
-    var <- input$variable_gemelo2
-    stats <- summary_stats(twins_comp, var)
+    variable_gemelo2 <- input$variable_gemelo2
+    stats <- summary_stats(twins_comp, variable_gemelo2)
     
     paste("Mínimo:", stats$Min, "Q1:", stats$Q1,"Mediana:", stats$Median, "Q3:", stats$Q3, 
           "Máximo:", stats$Max, sep = "\n")
