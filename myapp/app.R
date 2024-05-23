@@ -1,45 +1,49 @@
 library(shinydashboard) # Estructura de la página
 library(shinyjs)  # Para usar funciones de JavaScript
 library(ggplot2) # Crear gráficos y ponerlos bonitos
-library(dplyr) 
+library(dplyr) #calcular media, moda, mediana y demas
 
 # Cargar los datos de la base de datos
 twins <- read.csv("twins.txt", header = TRUE)
 
 # Calcular las variables necesarias para el reporte
-num_registros <- nrow(twins)#registros en la base original
-num_variables <- ncol(twins)#variables
+num_registros <- nrow(twins) # registros en la base original
+num_variables <- ncol(twins) # variables
 
+# Convierte las 16 columnas en numeric 
+cols_to_convert <- c("DLHRWAGE", "DEDUC1", "AGE", "AGESQ", "HRWAGEH", "WHITEH", "MALEH", 
+                     "EDUCH", "HRWAGEL", "WHITEL", "MALEL", "EDUCL", "DEDUC2", "DTEN", 
+                     "DMARRIED", "DUNCOV")
+twins[cols_to_convert] <- lapply(twins[cols_to_convert], as.numeric)
 
-#convierte las 16 columnas en numeric 
-twins$DLHRWAGE<- as.numeric(twins$DLHRWAGE)
-twins$DEDUC1<- as.numeric(twins$DEDUC1)
-twins$AGE<- as.numeric(twins$AGE)
-twins$AGESQ<- as.numeric(twins$AGESQ)
-twins$HRWAGEH<- as.numeric(twins$HRWAGEH)
-twins$WHITEH<- as.numeric(twins$WHITEH)
-twins$MALEH<- as.numeric(twins$MALEH)
-twins$EDUCH<- as.numeric(twins$EDUCH)
-twins$HRWAGEL<- as.numeric(twins$HRWAGEL)
-twins$WHITEL<- as.numeric(twins$WHITEL)
-twins$MALEL<- as.numeric(twins$MALEL)
-twins$EDUCL<- as.numeric(twins$EDUCL)
-twins$DEDUC2<- as.numeric(twins$DEDUC2)
-twins$DTEN<- as.numeric(twins$DTEN)
-twins$DMARRIED<- as.numeric(twins$DMARRIED)
-twins$DUNCOV<- as.numeric(twins$DUNCOV)
-
-#calcula las modas
-columna_especifica <- "AGE"
-moda_columna <- as.numeric(names(sort(table(twins[[columna_especifica]]), decreasing = TRUE))[1])
-
-#crear una nueva tabla sin NAs
+# Crear una nueva tabla sin NAs
 twins_copia1 <- na.omit(twins) # datos con registros completos
 
+# Discretizar años de educación y salario
+twins_copia1$EDUCH_disc <- cut(twins_copia1$EDUCH, breaks = c(0,10, 12, 15, 18, 21), labels = c("0-10","10-12", "13-15", "16-18", "19-21"))
+
+twins_copia1$EDUCL_disc <- cut(twins_copia1$EDUCL, breaks = c(0,10, 12, 15, 18, 21), labels = c("0-10","10-12", "13-15", "16-18", "19-21"))
+
+
+
+
+# Calcular los cuartiles, mínimos y máximos
+summary_stats <- function(data, var) {
+  q <- quantile(data[[var]], na.rm = TRUE)
+  list(
+    Min = min(data[[var]], na.rm = TRUE),
+    Q1 = q[2],
+    Median = q[3],
+    Q3 = q[4],
+    Max = max(data[[var]], na.rm = TRUE)
+  )
+}
+
+educh_stats <- summary_stats(twins_copia1, "EDUCH")
+hrwageh_stats <- summary_stats(twins_copia1, "HRWAGEH")
 
 # Definir la interfaz de usuario (UI)
 ui <- dashboardPage(
-  
   dashboardHeader(title = "Estudio gemelos"),
   dashboardSidebar(
     sidebarMenu(
@@ -47,8 +51,7 @@ ui <- dashboardPage(
       menuItem("Gráficos", tabName = "graficos", icon = icon("chart-line")),
       menuItem("Reporte", tabName = "Reporte", icon = icon("search")),
       menuItem("Análisis", tabName = "analisis", icon = icon("chart-bar"))
-    
-      )
+    )
   ),
   
   dashboardBody(
@@ -92,7 +95,7 @@ ui <- dashboardPage(
                           choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV")),
               actionButton("calcular_mediana_1", "Calcular Mediana"),
               verbatimTextOutput("mediana_resultado_1")
-            ),
+            )
           ),
           fluidRow(
             box(
@@ -122,13 +125,13 @@ ui <- dashboardPage(
           )
         )
       ),
-      
-        
       tabItem(
         tabName = "graficos",
         mainPanel(
           plotOutput("dotchart_1"),
-          plotOutput("dotchart_2")
+          plotOutput("dotchart_2"),
+          plotOutput("dotchart_discretizado_gemelo1"),
+          plotOutput("dotchart_discretizado_gemelo2") 
         )
       ),
       tabItem(
@@ -151,7 +154,8 @@ ui <- dashboardPage(
               width = 12,
               selectInput("variable_gemelo1", "Seleccionar variable:",
                           choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH", "DMARRIED", "DUNCOV")),
-              uiOutput("dispersion_gemelo1")
+              verbatimTextOutput("dispersion_gemelo1"),
+              verbatimTextOutput("cuartiles_gemelo1") # Agregar salida para cuartiles
             )
           ),
           column(
@@ -161,7 +165,8 @@ ui <- dashboardPage(
               width = 12,
               selectInput("variable_gemelo2", "Seleccionar variable:",
                           choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
-              uiOutput("dispersion_gemelo2")
+              verbatimTextOutput("dispersion_gemelo2"),
+              verbatimTextOutput("cuartiles_gemelo2") # Agregar salida para cuartiles
             )
           )
         )
@@ -169,72 +174,56 @@ ui <- dashboardPage(
     )
   )
 )
-      
+
 # Definir la lógica del servidor
 server <- function(input, output) {
-  # Leer archivo de Excel y preparar los datos
-  data <- eventReactive(input$file, {
-    req(input$file)
- 
-    # Convertir las columnas a numérico
-    cols_to_convert <- c("DLHRWAGE", "DEDUC1", "AGE", "AGESQ", "HRWAGEH", "WHITEH", "MALEH", 
-                         "EDUCH", "HRWAGEL", "WHITEL", "MALEL", "EDUCL", "DEDUC2", "DTEN", 
-                         "DMARRIED", "DUNCOV")
-    twins[cols_to_convert] <- lapply(twins[cols_to_convert], as.numeric)
-    
-  
-    list(original = twins, copia1 = twins_copia1)
-  })
-  
-  
   output$tabla_twins <- renderTable({
     twins_copia1
   })
   
   # Mostrar texto en la pestaña de Introducción
   output$texto_introduccion <- renderText({
-    "Tabla sin registros incompletos"
+    paste("Número de registros:", nrow(twins), "\n",
+          "Número de variables:", ncol(twins), "\n",
+          "Registros con información completa:", nrow(twins_copia1), "\n",
+          "Registros con información incompleta:", nrow(twins) - nrow(twins_copia1))
   })
-
+  
   # Controlar la visibilidad de la tabla
   observeEvent(input$toggleTable, {
     toggle("tabla_container")
   })
   
-  
   # Gráfico 1
-  
   output$dotchart_1 <- renderPlot({
-    ggplot(twins_copia1, aes(x = EDUCL, y = HRWAGEL)) + #Se usa para crear el dotchart
+    ggplot(twins_copia1, aes(x = EDUCL, y = HRWAGEL)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, color = "blue") +
-      labs(title = "Dotchart de EDUCH vs HRWAGEH", x = "Años de educación", y = "Salario en dólares") +
-      theme_minimal() + stat_summary(fun.y=mean, geom="point", shape=18,
-                                     size=3, color="red")
+      labs(title = "Dotchart de EDUCL vs HRWAGEL", x = "Años de educación", y = "Salario en dólares") +
+      theme_minimal() 
   })
-  #grafico 2
   
-  
-  
+  # Gráfico 2
   output$dotchart_2 <- renderPlot({
     ggplot(twins_copia1, aes(x = EDUCH, y = HRWAGEH)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "red") +
-      labs(title = "Dotchart de EDUCL vs HRWAGEL", x = "Años de educación", y = "Salario  en dólares") +
+      labs(title = "Dotchart de EDUCH vs HRWAGEH", x = "Años de educación", y = "Salario en dólares") +
       theme_minimal()
-    
   })
   
-  # Mostrar la cantidad de variables de tipo carácter
-  output$int <- renderText({
-    paste("numero de variables:", num_variables)
-    
+  # Gráfico discretizado gemelo 2
+  output$dotchart_discretizado_gemelo2 <- renderPlot({
+    ggplot(twins_copia1, aes(x = EDUCH_disc, y = HRWAGEH)) +
+      geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "purple") +
+      labs(title = "Dotchart Discretizado de EDUCH vs HRWAGEH", x = "Años de educación (Discretizado)", y = "Salario en dólares") +
+      theme_minimal()+stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "red")
   })
   
-  # Mostrar el reporte de datos en la pestaña de reporte
-  output$texto_introduccion <- renderText({
-    paste("Número de registros:", nrow(twins), "\n",
-          "Número de variables:", ncol(twins), "\n",
-          "Registros con información completa:", nrow(twins_copia1), "\n",
-          "Registros con información incompleta:",nrow(twins)-nrow(twins_copia1))
+  # grafico discretizado gemelo 1
+  output$dotchart_discretizado_gemelo1 <- renderPlot({
+    ggplot(twins_copia1, aes(x = EDUCL_disc, y = HRWAGEL)) +
+      geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "green") +
+      labs(title = "Dotchart Discretizado de EDUCH vs HRWAGEH", x = "Años de educación (Discretizado)", y = "Salario en dólares") +
+      theme_minimal()+stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "red")
   })
   
   # Calcular medidas de dispersión para gemelo 1
@@ -243,15 +232,14 @@ server <- function(input, output) {
     var <- input$variable_gemelo1
     dispersion_result <- twins_copia1[[var]]
     
-    dispersion <- sprintf("Dispersión: %f", sd(dispersion_result, na.rm = TRUE))
-    rango <- sprintf("Rango: %f", diff(range(dispersion_result, na.rm = TRUE)))
-    varianza <- sprintf("Varianza: %f", var(dispersion_result, na.rm = TRUE))
-    desviacion_estandar <- sprintf("Desviación Estándar: %f", sd(dispersion_result, na.rm = TRUE))
-    coeficiente_variacion <- sprintf("Coeficiente de Variación: %f", sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE))
+    dispersion <- sprintf("Dispersión: %.2f unidades", round(sd(dispersion_result, na.rm = TRUE), 2))
+    rango <- sprintf("Rango: %.2f unidades", round(diff(range(dispersion_result, na.rm = TRUE)), 2))
+    varianza <- sprintf("Varianza: %.2f unidades^2", round(var(dispersion_result, na.rm = TRUE), 2))
+    desviacion_estandar <- sprintf("Desviación Estándar: %.2f unidades", round(sd(dispersion_result, na.rm = TRUE), 2))
+    coeficiente_variacion <- sprintf("Coeficiente de Variación: %.2f %%", round(sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE), 2))
     
     paste(dispersion, rango, varianza, desviacion_estandar, coeficiente_variacion, sep = "\n")
   })
-  
   
   # Calcular medidas de dispersión para gemelo 2
   output$dispersion_gemelo2 <- renderText({
@@ -259,24 +247,44 @@ server <- function(input, output) {
     var <- input$variable_gemelo2
     dispersion_result <- twins_copia1[[var]]
     
-    dispersion <- sprintf("Dispersión: %f", sd(dispersion_result, na.rm = TRUE))
-    rango <- sprintf("Rango: %f", diff(range(dispersion_result, na.rm = TRUE)))
-    varianza <- sprintf("Varianza: %f", var(dispersion_result, na.rm = TRUE))
-    desviacion_estandar <- sprintf("Desviación Estándar: %f", sd(dispersion_result, na.rm = TRUE))
-    coeficiente_variacion <- sprintf("Coeficiente de Variación: %f", sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE))
+    dispersion <- sprintf("Dispersión: %.2f unidades", round(sd(dispersion_result, na.rm = TRUE), 2))
+    rango <- sprintf("Rango: %.2f unidades", round(diff(range(dispersion_result, na.rm = TRUE)), 2))
+    varianza <- sprintf("Varianza: %.2f unidades^2", round(var(dispersion_result, na.rm = TRUE), 2))
+    desviacion_estandar <- sprintf("Desviación Estándar: %.2f unidades", round(sd(dispersion_result, na.rm = TRUE), 2))
+    coeficiente_variacion <- sprintf("Coeficiente de Variación: %.2f %%", round(sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE), 2))
     
     paste(dispersion, rango, varianza, desviacion_estandar, coeficiente_variacion, sep = "\n")
   })
   
+  # Mostrar cuartiles para gemelo 1
+  output$cuartiles_gemelo1 <- renderText({
+    req(input$variable_gemelo1)
+    var <- input$variable_gemelo1
+    stats <- summary_stats(twins_copia1, var)
+    
+    paste("Mínimo:", stats$Min, "Q1:", stats$Q1,"Q2:", stats$Median,"Q3:", stats$Q3, 
+          "Máximo:", stats$Max, sep = "\n")
+  })
   
-# moda para el gemelo 1   
+  # Mostrar cuartiles para gemelo 2
+  output$cuartiles_gemelo2 <- renderText({
+    req(input$variable_gemelo2)
+    var <- input$variable_gemelo2
+    stats <- summary_stats(twins_copia1, var)
+    
+    paste("Mínimo:", stats$Min, "Q1:", stats$Q1,"Mediana:", stats$Median, "Q3:", stats$Q3, 
+          "Máximo:", stats$Max, sep = "\n")
+  })
+  
+  # Moda para el gemelo 1
   output$moda_resultado_1 <- renderText({
     req(input$calcular_moda_1)
     variable <- input$variable_moda_1
-    moda <- as.numeric(names(sort(table(twins_copia1[variable]), decreasing = TRUE))[1])
+    moda <- as.numeric(names(sort(table(twins_copia1[[variable]]), decreasing = TRUE))[1])
     paste("Moda de", variable, ":", moda)
   })
-# media para el gemelo 1
+  
+  # Media para el gemelo 1
   output$media_resultado_1 <- renderText({
     req(input$calcular_media_1)
     variable1 <- input$variable_media_1
@@ -284,7 +292,7 @@ server <- function(input, output) {
     paste("Media de", variable1, ":", media)
   })
   
-#mediana para el gemelo 1
+  # Mediana para el gemelo 1
   output$mediana_resultado_1 <- renderText({
     req(input$calcular_mediana_1)
     variable2 <- input$variable_mediana_1
@@ -292,31 +300,30 @@ server <- function(input, output) {
     paste("Mediana de", variable2, ":", mediana)
   })
   
-#moda para el gemelo 2
+  # Moda para el gemelo 2
   output$moda_resultado_2 <- renderText({
     req(input$calcular_moda_2)
     variable <- input$variable_moda_2
-    moda <- as.numeric(names(sort(table(twins_copia1[variable]), decreasing = TRUE))[1])
+    moda <- as.numeric(names(sort(table(twins_copia1[[variable]]), decreasing = TRUE))[1])
     paste("Moda de", variable, ":", moda)
   })
   
-#media para el gemelo 2
+  # Media para el gemelo 2
   output$media_resultado_2 <- renderText({
     req(input$calcular_media_2)
     variable1 <- input$variable_media_2
     media <- mean(twins_copia1[[variable1]], na.rm = TRUE)
     paste("Media de", variable1, ":", media)
   })
-#mediana para el gemelo 2
+  
+  # Mediana para el gemelo 2
   output$mediana_resultado_2 <- renderText({
     req(input$calcular_mediana_2)
     variable2 <- input$variable_mediana_2
     mediana <- median(twins_copia1[[variable2]], na.rm = TRUE)
     paste("Mediana de", variable2, ":", mediana)
   })
-
 }
-  
 
 # Ejecutar la aplicación Shiny
 shinyApp(ui = ui, server = server)
