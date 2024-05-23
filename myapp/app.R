@@ -50,6 +50,17 @@ summary_stats <- function(data, var) {
   )
 }
 
+
+get_units <- function(variable) {
+  if (variable %in% c("EDUCH", "EDUCL")) {
+    return("Años")
+  } else if (variable %in% c("HRWAGEH", "HRWAGEL")) {
+    return("pesos/h")
+  } else {
+    return("unidades")
+  }
+}
+
 educh_stats <- summary_stats(twins_comp, "EDUCH")
 hrwageh_stats <- summary_stats(twins_comp, "HRWAGEH")
 
@@ -120,8 +131,10 @@ ui <- dashboardPage(
               width = 12,
               selectInput("variable_gemelo1", "Seleccionar variable:",
                           choices = c("EDUCL","HRWAGEL")),
+              verbatimTextOutput("centros_gemelo1"),
               verbatimTextOutput("dispersion_gemelo1"),
               verbatimTextOutput("cuartiles_gemelo1") # Agregar salida para cuartiles
+              
             )
           ),
           column(
@@ -131,8 +144,10 @@ ui <- dashboardPage(
               width = 12,
               selectInput("variable_gemelo2", "Seleccionar variable:",
                           choices = c("EDUCH","HRWAGEH")),
+              verbatimTextOutput("centros_gemelo2"),
               verbatimTextOutput("dispersion_gemelo2"),
               verbatimTextOutput("cuartiles_gemelo2") # Agregar salida para cuartiles
+              
             )
           )
         )
@@ -263,7 +278,7 @@ server <- function(input, output) {
     variable_gemelo1 <- input$variable_gemelo1
     stats <- summary_stats(twins_comp, variable_gemelo1)
     
-    paste("Mínimo:", stats$Min, "Q1:", stats$Q1,"Q2:", stats$Median,"Q3:", stats$Q3, 
+    paste("Mínimo:", stats$Min, "cuartil 1:", stats$Q1,"cuartil 2:", stats$Median,"cuartil 3:", stats$Q3, 
           "Máximo:", stats$Max, sep = "\n")
   })
   
@@ -273,75 +288,41 @@ server <- function(input, output) {
     variable_gemelo2 <- input$variable_gemelo2
     stats <- summary_stats(twins_comp, variable_gemelo2)
     
-    paste("Mínimo:", stats$Min, "Q1:", stats$Q1,"Mediana:", stats$Median, "Q3:", stats$Q3, 
+    paste("Mínimo:", stats$Min, "cuartil 1:", stats$Q1,"cuartil 2:", stats$Median, "cuartil 3:", stats$Q3, 
           "Máximo:", stats$Max, sep = "\n")
   })
   
-  # Moda para el gemelo 1
-  output$moda_resultado_1 <- renderText({
-    req(input$calcular_moda_1)
-    variable <- input$variable_moda_1
+  # Función unificada para moda, media y mediana del gemelo 1
+  output$centros_gemelo1 <- renderText({
+    req(input$variable_gemelo1)
+    
+    variable <- input$variable_gemelo1
     moda <- as.numeric(names(sort(table(twins_comp[[variable]]), decreasing = TRUE))[1])
+    media <- mean(twins_comp[[variable]], na.rm = TRUE)
+    mediana <- median(twins_comp[[variable]], na.rm = TRUE)
     units <- get_units(variable)
-    paste("Moda de", variable, ":", moda,units)
+    
+    paste("Moda de", variable, ":", moda, units, "\n",
+          "Media de", variable, ":", round(media, 2), units, "\n",
+          "Mediana de", variable, ":", round(mediana, 2), units)
   })
   
-  # Media para el gemelo 1
-  output$media_resultado_1 <- renderText({
-    req(input$calcular_media_1)
-    variable1 <- input$variable_media_1
-    media <- mean(twins_comp[[variable1]], na.rm = TRUE)
-    units <- get_units(variable1)
-    paste("Media de", variable1, ":", media,units)
-  })
-  
-  # Mediana para el gemelo 1
-  output$mediana_resultado_1 <- renderText({
-    req(input$calcular_mediana_1)
-    variable2 <- input$variable_mediana_1
-    mediana <- median(twins_comp[[variable2]], na.rm = TRUE)
-    units <- get_units(variable2)
-    paste("Mediana de", variable2, ":", mediana,units)
-  })
-  
-  # Moda para el gemelo 2
-  output$moda_resultado_2 <- renderText({
-    req(input$calcular_moda_2)
-    variable <- input$variable_moda_2
+  # Función unificada para moda, media y mediana del gemelo 1
+  output$centros_gemelo2 <- renderText({
+    req(input$variable_gemelo1)
+    
+    variable <- input$variable_gemelo2
     moda <- as.numeric(names(sort(table(twins_comp[[variable]]), decreasing = TRUE))[1])
+    media <- mean(twins_comp[[variable]], na.rm = TRUE)
+    mediana <- median(twins_comp[[variable]], na.rm = TRUE)
     units <- get_units(variable)
-    paste("Moda de", variable, ":", moda,units)
-  })
+    
+    paste("Moda de", variable, ":", moda, units, "\n",
+          "Media de", variable, ":", round(media, 2), units, "\n",
+          "Mediana de", variable, ":", round(mediana, 2), units)
+})
   
-  # Media para el gemelo 2
-  output$media_resultado_2 <- renderText({
-    req(input$calcular_media_2)
-    variable1 <- input$variable_media_2
-    media <- mean(twins_comp[[variable1]], na.rm = TRUE)
-    units <- get_units(variable1)
-    paste("Media de", variable1, ":", media)
-  })
-  # Función para obtener las unidades adecuadas
-  get_units <- function(variable) {
-    if (variable %in% c("EDUCH", "EDUCL")) {
-      return("Años")
-    } else if (variable %in% c("HRWAGEH", "HRWAGEL")) {
-      return("pesos/h")
-    } else {
-      return("unidades")
-    }
-  }
-  
-  # Mediana para el gemelo 2
-  output$mediana_resultado_2 <- renderText({
-    req(input$calcular_mediana_2)
-    variable2 <- input$variable_mediana_2
-    mediana <- median(twins_comp[[variable2]], na.rm = TRUE)
-    units <- get_units(variable2)
-    paste("Mediana de", variable2, ":", mediana, units)
-  })
 }
-
 # Ejecutar la aplicación Shiny
 shinyApp(ui = ui, server = server)
 
