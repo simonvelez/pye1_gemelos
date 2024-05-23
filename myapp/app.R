@@ -17,12 +17,15 @@ cols_to_convert <- c("DLHRWAGE", "DEDUC1", "AGE", "AGESQ", "HRWAGEH", "WHITEH", 
 twins[cols_to_convert] <- lapply(twins[cols_to_convert], as.numeric)
 
 # Crear una nueva tabla sin NAs
-twins_copia1 <- na.omit(twins) # datos con registros completos
+twins_comp <- na.omit(twins) # datos con registros completos
+
+# Seleccionar solo las columnas útiles para el proyecto
+
 
 # Discretizar años de educación del gemelo 1 y el gemelo 2 
-twins_copia1$EDUCH_disc <- cut(twins_copia1$EDUCH, breaks = c(0,10, 12, 15, 18, 21), labels = c("0-10","10-12", "13-15", "16-18", "19-21"))
+twins_comp$EDUCH_disc <- cut(twins_comp$EDUCH, breaks = c(0,10, 12, 15, 18, 21), labels = c("0-10","10-12", "13-15", "16-18", "19-21"))
 
-twins_copia1$EDUCL_disc <- cut(twins_copia1$EDUCL, breaks = c(0,10, 12, 15, 18, 21), labels = c("0-10","10-12", "13-15", "16-18", "19-21"))
+twins_comp$EDUCL_disc <- cut(twins_comp$EDUCL, breaks = c(0,10, 12, 15, 18, 21), labels = c("0-10","10-12", "13-15", "16-18", "19-21"))
 
 
 
@@ -39,8 +42,8 @@ summary_stats <- function(data, var) {
   )
 }
 
-educh_stats <- summary_stats(twins_copia1, "EDUCH")
-hrwageh_stats <- summary_stats(twins_copia1, "HRWAGEH")
+educh_stats <- summary_stats(twins_comp, "EDUCH")
+hrwageh_stats <- summary_stats(twins_comp, "HRWAGEH")
 
 # Definir la interfaz de usuario (UI)
 ui <- dashboardPage(
@@ -178,15 +181,15 @@ ui <- dashboardPage(
 # Definir la lógica del servidor
 server <- function(input, output) {
   output$tabla_twins <- renderTable({
-    twins_copia1
+    twins_comp
   })
   
   # Mostrar texto en la pestaña de Introducción
   output$texto_introduccion <- renderText({
     paste("Número de registros:", nrow(twins), "\n",
           "Número de variables:", ncol(twins), "\n",
-          "Registros con información completa:", nrow(twins_copia1), "\n",
-          "Registros con información incompleta:", nrow(twins) - nrow(twins_copia1))
+          "Registros con información completa:", nrow(twins_comp), "\n",
+          "Registros con información incompleta:", nrow(twins) - nrow(twins_comp))
   })
   
   # Controlar la visibilidad de la tabla
@@ -196,7 +199,7 @@ server <- function(input, output) {
   
   # Gráfico 1
   output$dotchart_1 <- renderPlot({
-    ggplot(twins_copia1, aes(x = EDUCL, y = HRWAGEL)) +
+    ggplot(twins_comp, aes(x = EDUCL, y = HRWAGEL)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, color = "blue") +
       labs(title = "Dotchart de EDUCL vs HRWAGEL", x = "Años de educación", y = "Salario en dólares") +
       theme_minimal() 
@@ -204,7 +207,7 @@ server <- function(input, output) {
   
   # Gráfico 2
   output$dotchart_2 <- renderPlot({
-    ggplot(twins_copia1, aes(x = EDUCH, y = HRWAGEH)) +
+    ggplot(twins_comp, aes(x = EDUCH, y = HRWAGEH)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "red") +
       labs(title = "Dotchart de EDUCH vs HRWAGEH", x = "Años de educación", y = "Salario en dólares") +
       theme_minimal()
@@ -212,7 +215,7 @@ server <- function(input, output) {
   
   # Gráfico discretizado gemelo 2
   output$dotchart_discretizado_gemelo2 <- renderPlot({
-    ggplot(twins_copia1, aes(x = EDUCH_disc, y = HRWAGEH)) +
+    ggplot(twins_comp, aes(x = EDUCH_disc, y = HRWAGEH)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "purple") +
       labs(title = "Dotchart Discretizado de EDUCH vs HRWAGEH", x = "Años de educación (Discretizado)", y = "Salario en dólares") +
       theme_minimal()+stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "red")
@@ -220,7 +223,7 @@ server <- function(input, output) {
   
   # grafico discretizado gemelo 1
   output$dotchart_discretizado_gemelo1 <- renderPlot({
-    ggplot(twins_copia1, aes(x = EDUCL_disc, y = HRWAGEL)) +
+    ggplot(twins_comp, aes(x = EDUCL_disc, y = HRWAGEL)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "green") +
       labs(title = "Dotchart Discretizado de EDUCH vs HRWAGEH", x = "Años de educación (Discretizado)", y = "Salario en dólares") +
       theme_minimal()+stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "red")
@@ -230,7 +233,7 @@ server <- function(input, output) {
   output$dispersion_gemelo1 <- renderText({
     req(input$variable_gemelo1)
     var <- input$variable_gemelo1
-    dispersion_result <- twins_copia1[[var]]
+    dispersion_result <- twins_comp[[var]]
     
     dispersion <- sprintf("Dispersión: %.2f unidades", round(sd(dispersion_result, na.rm = TRUE), 2))
     rango <- sprintf("Rango: %.2f unidades", round(diff(range(dispersion_result, na.rm = TRUE)), 2))
@@ -245,7 +248,7 @@ server <- function(input, output) {
   output$dispersion_gemelo2 <- renderText({
     req(input$variable_gemelo2)
     var <- input$variable_gemelo2
-    dispersion_result <- twins_copia1[[var]]
+    dispersion_result <- twins_comp[[var]]
     
     dispersion <- sprintf("Dispersión: %.2f unidades", round(sd(dispersion_result, na.rm = TRUE), 2))
     rango <- sprintf("Rango: %.2f unidades", round(diff(range(dispersion_result, na.rm = TRUE)), 2))
@@ -260,7 +263,7 @@ server <- function(input, output) {
   output$cuartiles_gemelo1 <- renderText({
     req(input$variable_gemelo1)
     var <- input$variable_gemelo1
-    stats <- summary_stats(twins_copia1, var)
+    stats <- summary_stats(twins_comp, var)
     
     paste("Mínimo:", stats$Min, "Q1:", stats$Q1,"Q2:", stats$Median,"Q3:", stats$Q3, 
           "Máximo:", stats$Max, sep = "\n")
@@ -270,7 +273,7 @@ server <- function(input, output) {
   output$cuartiles_gemelo2 <- renderText({
     req(input$variable_gemelo2)
     var <- input$variable_gemelo2
-    stats <- summary_stats(twins_copia1, var)
+    stats <- summary_stats(twins_comp, var)
     
     paste("Mínimo:", stats$Min, "Q1:", stats$Q1,"Mediana:", stats$Median, "Q3:", stats$Q3, 
           "Máximo:", stats$Max, sep = "\n")
@@ -280,7 +283,7 @@ server <- function(input, output) {
   output$moda_resultado_1 <- renderText({
     req(input$calcular_moda_1)
     variable <- input$variable_moda_1
-    moda <- as.numeric(names(sort(table(twins_copia1[[variable]]), decreasing = TRUE))[1])
+    moda <- as.numeric(names(sort(table(twins_comp[[variable]]), decreasing = TRUE))[1])
     paste("Moda de", variable, ":", moda)
   })
   
@@ -288,7 +291,7 @@ server <- function(input, output) {
   output$media_resultado_1 <- renderText({
     req(input$calcular_media_1)
     variable1 <- input$variable_media_1
-    media <- mean(twins_copia1[[variable1]], na.rm = TRUE)
+    media <- mean(twins_comp[[variable1]], na.rm = TRUE)
     paste("Media de", variable1, ":", media)
   })
   
@@ -296,7 +299,7 @@ server <- function(input, output) {
   output$mediana_resultado_1 <- renderText({
     req(input$calcular_mediana_1)
     variable2 <- input$variable_mediana_1
-    mediana <- median(twins_copia1[[variable2]], na.rm = TRUE)
+    mediana <- median(twins_comp[[variable2]], na.rm = TRUE)
     paste("Mediana de", variable2, ":", mediana)
   })
   
@@ -304,7 +307,7 @@ server <- function(input, output) {
   output$moda_resultado_2 <- renderText({
     req(input$calcular_moda_2)
     variable <- input$variable_moda_2
-    moda <- as.numeric(names(sort(table(twins_copia1[[variable]]), decreasing = TRUE))[1])
+    moda <- as.numeric(names(sort(table(twins_comp[[variable]]), decreasing = TRUE))[1])
     paste("Moda de", variable, ":", moda)
   })
   
@@ -312,7 +315,7 @@ server <- function(input, output) {
   output$media_resultado_2 <- renderText({
     req(input$calcular_media_2)
     variable1 <- input$variable_media_2
-    media <- mean(twins_copia1[[variable1]], na.rm = TRUE)
+    media <- mean(twins_comp[[variable1]], na.rm = TRUE)
     paste("Media de", variable1, ":", media)
   })
   
@@ -320,7 +323,7 @@ server <- function(input, output) {
   output$mediana_resultado_2 <- renderText({
     req(input$calcular_mediana_2)
     variable2 <- input$variable_mediana_2
-    mediana <- median(twins_copia1[[variable2]], na.rm = TRUE)
+    mediana <- median(twins_comp[[variable2]], na.rm = TRUE)
     paste("Mediana de", variable2, ":", mediana)
   })
 }
