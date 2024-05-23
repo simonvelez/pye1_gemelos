@@ -55,7 +55,7 @@ get_units <- function(variable) {
   if (variable %in% c("EDUCH", "EDUCL")) {
     return("Años")
   } else if (variable %in% c("HRWAGEH", "HRWAGEL")) {
-    return("pesos/h")
+    return("$")
   } else {
     return("unidades")
   }
@@ -212,7 +212,7 @@ server <- function(input, output) {
   output$dotchart_1 <- renderPlot({
     ggplot(twins_comp, aes(x = EDUCL, y = HRWAGEL)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, color = "blue") +
-      labs(title = "Dotchart de gemelo1", x = "Años de educación", y = "Salario en dólares") +
+      labs(title = "Dotchart de gemelo1", x = "Años de educación", y = "Salario por hora ($)") +
       theme_minimal() 
   })
   
@@ -220,7 +220,7 @@ server <- function(input, output) {
   output$dotchart_2 <- renderPlot({
     ggplot(twins_comp, aes(x = EDUCH, y = HRWAGEH)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "red") +
-      labs(title = "Dotchart de gemelo2", x = "Años de educación", y = "Salario en dólares") +
+      labs(title = "Dotchart de gemelo2", x = "Años de educación", y = "Salario por hora ($)") +
       theme_minimal()
   })
   
@@ -229,14 +229,14 @@ server <- function(input, output) {
   output$dotchart_discretizado_gemelo1 <- renderPlot({
     ggplot(twins_comp, aes(x = EDUCL_disc, y = HRWAGEL)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "green") +
-      labs(title = "Dotchart Discretizado de gemelo1", x = "Años de educación (Discretizado)", y = "Salario en dólares") +
+      labs(title = "Dotchart Discretizado de gemelo1", x = "Años de educación (Discretizado)", y = "Salario por hora ($)") +
       theme_minimal()+stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "red")
   })
   # Gráfico discretizado gemelo 2
   output$dotchart_discretizado_gemelo2 <- renderPlot({
     ggplot(twins_comp, aes(x = EDUCH_disc, y = HRWAGEH)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "purple") +
-      labs(title = "Dotchart Discretizado de gemelo2", x = "Años de educación (Discretizado)", y = "Salario en dólares") +
+      labs(title = "Dotchart Discretizado de gemelo2", x = "Años de educación (Discretizado)", y = "Salario por hora ($)") +
       theme_minimal()+stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "red")
   })
   
@@ -277,9 +277,14 @@ server <- function(input, output) {
     req(input$variable_gemelo1)
     variable_gemelo1 <- input$variable_gemelo1
     stats <- summary_stats(twins_comp, variable_gemelo1)
+    units <- get_units(variable_gemelo1)
     
-    paste("Mínimo:", stats$Min, "cuartil 1:", stats$Q1,"cuartil 2:", stats$Median,"cuartil 3:", stats$Q3, 
-          "Máximo:", stats$Max, sep = "\n")
+    paste("Mínimo:", stats$Min, units, "\n",
+          "Cuartil 1:", stats$Q1, units, "\n",
+          "Cuartil 2:", stats$Median, units, "\n",
+          "Cuartil 3:", stats$Q3, units, "\n",
+          "Máximo:", stats$Max, units
+          )
   })
   
   # Mostrar cuartiles para gemelo 2
@@ -287,9 +292,14 @@ server <- function(input, output) {
     req(input$variable_gemelo2)
     variable_gemelo2 <- input$variable_gemelo2
     stats <- summary_stats(twins_comp, variable_gemelo2)
+    units <- get_units(variable_gemelo2)
     
-    paste("Mínimo:", stats$Min, "cuartil 1:", stats$Q1,"cuartil 2:", stats$Median, "cuartil 3:", stats$Q3, 
-          "Máximo:", stats$Max, sep = "\n")
+    paste("Mínimo:", stats$Min, units, "\n",
+          "Cuartil 1:", stats$Q1, units, "\n",
+          "Cuartil 2:", stats$Median, units, "\n",
+          "Cuartil 3:", stats$Q3, units, "\n",
+          "Máximo:", stats$Max, units
+          )
   })
   
   # Función unificada para moda, media y mediana del gemelo 1
