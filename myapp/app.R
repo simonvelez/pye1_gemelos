@@ -216,6 +216,8 @@ server <- function(input, output) {
     toggle("graficas_discretizadas")
   })
   
+  
+  
   # Gráfico 1
   output$dotchart_1 <- renderPlot({
     ggplot(twins_comp, aes(x = EDUCL, y = HRWAGEL)) +
@@ -253,30 +255,32 @@ server <- function(input, output) {
     req(input$variable_gemelo1)
     var <- input$variable_gemelo1
     dispersion_result <- twins_comp[[var]]
+    units <- get_units(var)
     
-    dispersion <- sprintf("Dispersión: %.2f unidades", round(sd(dispersion_result, na.rm = TRUE), 2))
-    rango <- sprintf("Rango: %.2f unidades", round(diff(range(dispersion_result, na.rm = TRUE)), 2))
-    varianza <- sprintf("Varianza: %.2f unidades^2", round(var(dispersion_result, na.rm = TRUE), 2))
-    desviacion_estandar <- sprintf("Desviación Estándar: %.2f unidades", round(sd(dispersion_result, na.rm = TRUE), 2))
-    coeficiente_variacion <- sprintf("Coeficiente de Variación: %.2f %%", round(sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE), 2))
+    dispersion <- sprintf("Dispersión: %.2f %s", round(sd(dispersion_result, na.rm = TRUE), 2), units)
+    rango <- sprintf("Rango: %.2f %s", round(diff(range(dispersion_result, na.rm = TRUE)), 2), units)
+    varianza <- sprintf("Varianza: %.2f %s^2", round(var(dispersion_result, na.rm = TRUE), 2), units)
+    desviacion_estandar <- sprintf("Desviación Estándar: %.2f %s", round(sd(dispersion_result, na.rm = TRUE), 2), units)
+    coeficiente_variacion <- sprintf("Coeficiente de Variación: %.2f %%", round(sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE), 2) * 100)
     
     paste(dispersion, rango, varianza, desviacion_estandar, coeficiente_variacion, sep = "\n")
   })
-  
   # Calcular medidas de dispersión para gemelo 2
   output$dispersion_gemelo2 <- renderText({
     req(input$variable_gemelo2)
     var <- input$variable_gemelo2
     dispersion_result <- twins_comp[[var]]
+    units <- get_units(var)
     
-    dispersion <- sprintf("Dispersión: %.2f unidades", round(sd(dispersion_result, na.rm = TRUE), 2))
-    rango <- sprintf("Rango: %.2f unidades", round(diff(range(dispersion_result, na.rm = TRUE)), 2))
-    varianza <- sprintf("Varianza: %.2f unidades^2", round(var(dispersion_result, na.rm = TRUE), 2))
-    desviacion_estandar <- sprintf("Desviación Estándar: %.2f unidades", round(sd(dispersion_result, na.rm = TRUE), 2))
-    coeficiente_variacion <- sprintf("Coeficiente de Variación: %.2f %%", round(sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE), 2))
+    dispersion <- sprintf("Dispersión: %.2f %s", round(sd(dispersion_result, na.rm = TRUE), 2), units)
+    rango <- sprintf("Rango: %.2f %s", round(diff(range(dispersion_result, na.rm = TRUE)), 2), units)
+    varianza <- sprintf("Varianza: %.2f %s^2", round(var(dispersion_result, na.rm = TRUE), 2), units)
+    desviacion_estandar <- sprintf("Desviación Estándar: %.2f %s", round(sd(dispersion_result, na.rm = TRUE), 2), units)
+    coeficiente_variacion <- sprintf("Coeficiente de Variación: %.2f %%", round(sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE), 2) * 100)
     
     paste(dispersion, rango, varianza, desviacion_estandar, coeficiente_variacion, sep = "\n")
   })
+  
   
   # Mostrar cuartiles para gemelo 1
   output$cuartiles_gemelo1 <- renderText({
@@ -303,7 +307,8 @@ server <- function(input, output) {
     req(input$calcular_moda_1)
     variable <- input$variable_moda_1
     moda <- as.numeric(names(sort(table(twins_comp[[variable]]), decreasing = TRUE))[1])
-    paste("Moda de", variable, ":", moda)
+    units <- get_units(variable)
+    paste("Moda de", variable, ":", moda,units)
   })
   
   # Media para el gemelo 1
@@ -311,7 +316,8 @@ server <- function(input, output) {
     req(input$calcular_media_1)
     variable1 <- input$variable_media_1
     media <- mean(twins_comp[[variable1]], na.rm = TRUE)
-    paste("Media de", variable1, ":", media)
+    units <- get_units(variable1)
+    paste("Media de", variable1, ":", media,units)
   })
   
   # Mediana para el gemelo 1
@@ -319,7 +325,8 @@ server <- function(input, output) {
     req(input$calcular_mediana_1)
     variable2 <- input$variable_mediana_1
     mediana <- median(twins_comp[[variable2]], na.rm = TRUE)
-    paste("Mediana de", variable2, ":", mediana)
+    units <- get_units(variable2)
+    paste("Mediana de", variable2, ":", mediana,units)
   })
   
   # Moda para el gemelo 2
@@ -327,7 +334,8 @@ server <- function(input, output) {
     req(input$calcular_moda_2)
     variable <- input$variable_moda_2
     moda <- as.numeric(names(sort(table(twins_comp[[variable]]), decreasing = TRUE))[1])
-    paste("Moda de", variable, ":", moda)
+    units <- get_units(variable)
+    paste("Moda de", variable, ":", moda,units)
   })
   
   # Media para el gemelo 2
@@ -335,15 +343,27 @@ server <- function(input, output) {
     req(input$calcular_media_2)
     variable1 <- input$variable_media_2
     media <- mean(twins_comp[[variable1]], na.rm = TRUE)
+    units <- get_units(variable1)
     paste("Media de", variable1, ":", media)
   })
+  # Función para obtener las unidades adecuadas
+  get_units <- function(variable) {
+    if (variable %in% c("EDUCH", "EDUCL")) {
+      return("Años")
+    } else if (variable %in% c("HRWAGEH", "HRWAGEL")) {
+      return("pesos/h")
+    } else {
+      return("unidades")
+    }
+  }
   
   # Mediana para el gemelo 2
   output$mediana_resultado_2 <- renderText({
     req(input$calcular_mediana_2)
     variable2 <- input$variable_mediana_2
     mediana <- median(twins_comp[[variable2]], na.rm = TRUE)
-    paste("Mediana de", variable2, ":", mediana)
+    units <- get_units(variable2)
+    paste("Mediana de", variable2, ":", mediana, units)
   })
 }
 
