@@ -20,6 +20,8 @@ twins[cols_to_convert] <- lapply(twins[cols_to_convert], as.numeric)
 twins_comp <- na.omit(twins) # datos con registros completos
 
 # Seleccionar solo las columnas útiles para el proyecto
+twins_comp %>%
+  select(EDUCH, EDUCL, HRWAGEL, HRWAGEH)
 
 
 # Discretizar años de educación del gemelo 1 y el gemelo 2 
