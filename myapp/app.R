@@ -80,7 +80,7 @@ ui <- dashboardPage(
               title = "Calcular Moda gemelo 1 ",
               width = 4,
               selectInput("variable_moda_1", "Seleccionar variable:",
-                          choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV")),
+                          choices = c("EDUCL","HRWAGEL")),
               actionButton("calcular_moda_1", "Calcular Moda"),
               verbatimTextOutput("moda_resultado_1")
             ),
@@ -88,7 +88,7 @@ ui <- dashboardPage(
               title = "Calcular Media gemelo 1",
               width = 4,
               selectInput("variable_media_1", "Seleccionar variable:",
-                          choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV")),
+                          choices = c("EDUCL","HRWAGEL")),
               actionButton("calcular_media_1", "Calcular Media"),
               verbatimTextOutput("media_resultado_1")
             ),
@@ -96,7 +96,7 @@ ui <- dashboardPage(
               title = "Calcular Mediana gemelo 1",
               width = 4,
               selectInput("variable_mediana_1", "Seleccionar variable:",
-                          choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH","DMARRIED", "DUNCOV")),
+                          choices = c("EDUCL","HRWAGEL")),
               actionButton("calcular_mediana_1", "Calcular Mediana"),
               verbatimTextOutput("mediana_resultado_1")
             )
@@ -106,7 +106,7 @@ ui <- dashboardPage(
               title = "Calcular Moda gemelo 2 ",
               width = 4,
               selectInput("variable_moda_2", "Seleccionar variable:",
-                          choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
+                          choices = c("EDUCH","HRWAGEH")),
               actionButton("calcular_moda_2", "Calcular Moda"),
               verbatimTextOutput("moda_resultado_2")
             ),
@@ -114,7 +114,7 @@ ui <- dashboardPage(
               title = "Calcular Media gemelo 2",
               width = 4,
               selectInput("variable_media_2", "Seleccionar variable:",
-                          choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
+                          choices = c("EDUCH","HRWAGEH")),
               actionButton("calcular_media_2", "Calcular Media"),
               verbatimTextOutput("media_resultado_2")
             ),
@@ -122,7 +122,7 @@ ui <- dashboardPage(
               title = "Calcular Mediana gemelo 2",
               width = 4,
               selectInput("variable_mediana_2", "Seleccionar variable:",
-                          choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
+                          choices = c("EDUCH","HRWAGEH")),
               actionButton("calcular_mediana_2", "Calcular Mediana"),
               verbatimTextOutput("mediana_resultado_2")
             )
