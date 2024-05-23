@@ -19,7 +19,7 @@ twins[cols_to_convert] <- lapply(twins[cols_to_convert], as.numeric)
 # Crear una nueva tabla sin NAs
 twins_copia1 <- na.omit(twins) # datos con registros completos
 
-# Discretizar años de educación y salario
+# Discretizar años de educación del gemelo 1 y el gemelo 2 
 twins_copia1$EDUCH_disc <- cut(twins_copia1$EDUCH, breaks = c(0,10, 12, 15, 18, 21), labels = c("0-10","10-12", "13-15", "16-18", "19-21"))
 
 twins_copia1$EDUCL_disc <- cut(twins_copia1$EDUCL, breaks = c(0,10, 12, 15, 18, 21), labels = c("0-10","10-12", "13-15", "16-18", "19-21"))
