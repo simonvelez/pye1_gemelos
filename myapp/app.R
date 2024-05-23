@@ -220,7 +220,7 @@ server <- function(input, output) {
   output$dotchart_1 <- renderPlot({
     ggplot(twins_comp, aes(x = EDUCL, y = HRWAGEL)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, color = "blue") +
-      labs(title = "Dotchart de EDUCL vs HRWAGEL", x = "Años de educación", y = "Salario en dólares") +
+      labs(title = "Dotchart de gemelo1", x = "Años de educación", y = "Salario en dólares") +
       theme_minimal() 
   })
   
@@ -228,23 +228,23 @@ server <- function(input, output) {
   output$dotchart_2 <- renderPlot({
     ggplot(twins_comp, aes(x = EDUCH, y = HRWAGEH)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "red") +
-      labs(title = "Dotchart de EDUCH vs HRWAGEH", x = "Años de educación", y = "Salario en dólares") +
+      labs(title = "Dotchart de gemelo2", x = "Años de educación", y = "Salario en dólares") +
       theme_minimal()
   })
   
-  # Gráfico discretizado gemelo 2
-  output$dotchart_discretizado_gemelo2 <- renderPlot({
-    ggplot(twins_comp, aes(x = EDUCH_disc, y = HRWAGEH)) +
-      geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "purple") +
-      labs(title = "Dotchart Discretizado de EDUCH vs HRWAGEH", x = "Años de educación (Discretizado)", y = "Salario en dólares") +
-      theme_minimal()+stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "red")
-  })
   
   # grafico discretizado gemelo 1
   output$dotchart_discretizado_gemelo1 <- renderPlot({
     ggplot(twins_comp, aes(x = EDUCL_disc, y = HRWAGEL)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "green") +
-      labs(title = "Dotchart Discretizado de EDUCH vs HRWAGEH", x = "Años de educación (Discretizado)", y = "Salario en dólares") +
+      labs(title = "Dotchart Discretizado de gemelo1", x = "Años de educación (Discretizado)", y = "Salario en dólares") +
+      theme_minimal()+stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "red")
+  })
+  # Gráfico discretizado gemelo 2
+  output$dotchart_discretizado_gemelo2 <- renderPlot({
+    ggplot(twins_comp, aes(x = EDUCH_disc, y = HRWAGEH)) +
+      geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "purple") +
+      labs(title = "Dotchart Discretizado de gemelo2", x = "Años de educación (Discretizado)", y = "Salario en dólares") +
       theme_minimal()+stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "red")
   })
   
