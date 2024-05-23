@@ -165,7 +165,7 @@ ui <- dashboardPage(
               title = "Medidas de Dispersión del Gemelo 1",
               width = 12,
               selectInput("variable_gemelo1", "Seleccionar variable:",
-                          choices = c("DEDUC1", "AGE", "HRWAGEH", "WHITEH", "MALEH", "EDUCH", "DMARRIED", "DUNCOV")),
+                          choices = c("EDUCL","HRWAGEL")),
               verbatimTextOutput("dispersion_gemelo1"),
               verbatimTextOutput("cuartiles_gemelo1") # Agregar salida para cuartiles
             )
@@ -176,7 +176,7 @@ ui <- dashboardPage(
               title = "Medidas de Dispersión del Gemelo 2",
               width = 12,
               selectInput("variable_gemelo2", "Seleccionar variable:",
-                          choices = c("WHITEL", "AGESQ", "MALEL", "EDUCL", "DEDUC2", "DTEN", "DMARRIED", "DUNCOV")),
+                          choices = c("EDUCH","HRWAGEH")),
               verbatimTextOutput("dispersion_gemelo2"),
               verbatimTextOutput("cuartiles_gemelo2") # Agregar salida para cuartiles
             )
