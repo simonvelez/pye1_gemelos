@@ -10,6 +10,7 @@ twins <- read.csv("twins.txt", header = TRUE)
 num_registros <- nrow(twins) # registros en la base original
 num_variables <- ncol(twins) # variables
 
+
 # Convierte las 16 columnas en numeric 
 cols_to_convert <- c("DLHRWAGE", "DEDUC1", "AGE", "AGESQ", "HRWAGEH", "WHITEH", "MALEH", 
                      "EDUCH", "HRWAGEL", "WHITEL", "MALEL", "EDUCL", "DEDUC2", "DTEN", 
@@ -18,6 +19,9 @@ twins[cols_to_convert] <- lapply(twins[cols_to_convert], as.numeric)
 
 # Crear una nueva tabla sin NAs
 twins_comp <- na.omit(twins) # datos con registros completos
+
+#calcular la dimension de la tabla
+dim_datos<- paste("Número de filas:", dim(twins)[1], "\nNúmero de columnas:", dim(twins)[2])
 
 # Seleccionar solo las columnas útiles para el proyecto
 twins_comp %>%
@@ -28,6 +32,8 @@ twins_comp %>%
 twins_comp$EDUCH_disc <- cut(twins_comp$EDUCH, breaks = c(0,10, 12, 15, 18, 21), labels = c("0-10","10-12", "13-15", "16-18", "19-21"))
 
 twins_comp$EDUCL_disc <- cut(twins_comp$EDUCL, breaks = c(0,10, 12, 15, 18, 21), labels = c("0-10","10-12", "13-15", "16-18", "19-21"))
+
+
 
 
 
@@ -164,23 +170,23 @@ server <- function(input, output) {
       "Número de variables" = ncol(twins),
       "Registros con información completa" = nrow(twins_comp),
       "Registros con información incompleta" = nrow(twins) - nrow(twins_comp),
-      "Dimensión de la base de datos con la información completa" = "[PENDIENTE]"
+      "Dimensión de la base de datos con la información completa" = dim_datos
     )
   })
   
 
   
-  # Controlar la visibilidad de la tabla
+  # Controlar la visibilidad de la tabla ___introduccion 
   observeEvent(input$toggleTable, {
     toggle("tabla_container")
   })
   
-  # Controlar la visibilidad de las gráficas sin discretizar
+  # Controlar la visibilidad de las gráficas sin discretizar ___graficos
   observeEvent(input$botongraficos, {
     toggle("graficos_sindiscretizar")
   })
   
-  # Controlar la visibilidad de las gráficas discretizadas
+  # Controlar la visibilidad de las gráficas discretizadas ___graficos
   observeEvent(input$botongraficosdiscretizados, {
     toggle("graficas_discretizadas")
   })
