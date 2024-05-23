@@ -65,7 +65,7 @@ ui <- dashboardPage(
         tabName = "Introduccion",
         fluidRow(
           box(
-            title = "Introducción",
+            title = "Visualización de datos con DotChart: ¿Influye la escolaridad en el salario? Un estudio con gemelos Monocigóticos",
             width = 12,
             actionButton("toggleTable", "Mostrar/Ocultar Tabla"),
             hidden(
@@ -73,60 +73,8 @@ ui <- dashboardPage(
                   tableOutput("tabla_twins")
               )
             ),
-            verbatimTextOutput("texto_introduccion")
+            uiOutput("texto_introduccion") # Mostrar el texto con la información
           ),
-          fluidRow(
-            box(
-              title = "Calcular Moda gemelo 1 ",
-              width = 4,
-              selectInput("variable_moda_1", "Seleccionar variable:",
-                          choices = c("EDUCL","HRWAGEL")),
-              actionButton("calcular_moda_1", "Calcular Moda"),
-              verbatimTextOutput("moda_resultado_1")
-            ),
-            box(
-              title = "Calcular Media gemelo 1",
-              width = 4,
-              selectInput("variable_media_1", "Seleccionar variable:",
-                          choices = c("EDUCL","HRWAGEL")),
-              actionButton("calcular_media_1", "Calcular Media"),
-              verbatimTextOutput("media_resultado_1")
-            ),
-            box(
-              title = "Calcular Mediana gemelo 1",
-              width = 4,
-              selectInput("variable_mediana_1", "Seleccionar variable:",
-                          choices = c("EDUCL","HRWAGEL")),
-              actionButton("calcular_mediana_1", "Calcular Mediana"),
-              verbatimTextOutput("mediana_resultado_1")
-            )
-          ),
-          fluidRow(
-            box(
-              title = "Calcular Moda gemelo 2 ",
-              width = 4,
-              selectInput("variable_moda_2", "Seleccionar variable:",
-                          choices = c("EDUCH","HRWAGEH")),
-              actionButton("calcular_moda_2", "Calcular Moda"),
-              verbatimTextOutput("moda_resultado_2")
-            ),
-            box(
-              title = "Calcular Media gemelo 2",
-              width = 4,
-              selectInput("variable_media_2", "Seleccionar variable:",
-                          choices = c("EDUCH","HRWAGEH")),
-              actionButton("calcular_media_2", "Calcular Media"),
-              verbatimTextOutput("media_resultado_2")
-            ),
-            box(
-              title = "Calcular Mediana gemelo 2",
-              width = 4,
-              selectInput("variable_mediana_2", "Seleccionar variable:",
-                          choices = c("EDUCH","HRWAGEH")),
-              actionButton("calcular_mediana_2", "Calcular Mediana"),
-              verbatimTextOutput("mediana_resultado_2")
-            )
-          )
         )
       ),
       tabItem(
@@ -194,12 +142,33 @@ server <- function(input, output) {
   })
   
   # Mostrar texto en la pestaña de Introducción
-  output$texto_introduccion <- renderText({
-    paste("Número de registros:", nrow(twins), "\n",
-          "Número de variables:", ncol(twins), "\n",
-          "Registros con información completa:", nrow(twins_comp), "\n",
-          "Registros con información incompleta:", nrow(twins) - nrow(twins_comp))
+  output$texto_introduccion <- renderUI({
+    fluidRow(
+      box(
+        width = 12,
+        textOutput("intro_paragraph"),
+        footer = tagList(
+          tableOutput("data_summary")
+        )
+      )
+    )
   })
+  
+  output$intro_paragraph <- renderText({
+    "Se desea estudiar la incidencia de los años de escolaridad en el ingreso por hora, para lo cual, se cuenta con la información de pares de gemelos monocigóticos mayores de 18 años respecto a diversas variables sociodemográficas de interés."
+  })
+  
+  output$data_summary <- renderTable({
+    data.frame(
+      "Número de registros" = nrow(twins),
+      "Número de variables" = ncol(twins),
+      "Registros con información completa" = nrow(twins_comp),
+      "Registros con información incompleta" = nrow(twins) - nrow(twins_comp),
+      "Dimensión de la base de datos con la información completa" = "[PENDIENTE]"
+    )
+  })
+  
+
   
   # Controlar la visibilidad de la tabla
   observeEvent(input$toggleTable, {
