@@ -1,5 +1,5 @@
 library(shinydashboard) # Estructura de la página
-library(shinyjs)  # Para usar funciones de JavaScript
+library(shinyjs)  # Para usar funciones de JavaScript (botones)
 library(ggplot2) # Crear gráficos y ponerlos bonitos
 library(dplyr) #calcular media, moda, mediana y demas
 
@@ -27,12 +27,12 @@ dim_datos<- paste("Número de filas:", dim(twins_comp)[1], "\nNúmero de columna
 # Discretizar años de educación del gemelo 1 y el gemelo 2 
 
 #Según nivel educativo:
-twins_comp$EDUCH_disc_edu <- cut(twins_comp$EDUCH, breaks = c(0,6,12,16,22), labels = c("Primaria (0-6)", "Secundaria (6-12)", "Pregrado (12-16)", "Posgrado (16-22)"))
-twins_comp$EDUCL_disc_edu <- cut(twins_comp$EDUCL, breaks = c(0,6,12,16,22), labels = c("Primaria (0-6)", "Secundaria (6-12)", "Pregrado (12-16)", "Posgrado (16-22)"))
+twins_comp$EDUCH_disc_edu <- cut(twins_comp$EDUCH, breaks = c(0,6,12,16,22), labels = c("Primaria (0-6]", "Secundaria (6-12]", "Pregrado (13-16]", "Posgrado (17-22]"))
+twins_comp$EDUCL_disc_edu <- cut(twins_comp$EDUCL, breaks = c(0,6,12,16,22), labels = c("Primaria (0-6]", "Secundaria (6-12]", "Pregrado (13-16]", "Posgrado (17-22]"))
 
 #Según cuartiles:
-twins_comp$EDUCH_disc_cua <- cut(twins_comp$EDUCH, breaks = c(0,12,14,16,20), labels = c("Q1 (0-12)", "Q2 (12-14)", "Q3 (14-16)", "Q4 (16-20)"))
-twins_comp$EDUCL_disc_cua <- cut(twins_comp$EDUCL, breaks = c(0,12,14,16,20), labels = c("Q1 (0-12)", "Q2 (12-14)", "Q3 (14-16)", "Q4 (16-20)"))
+twins_comp$EDUCH_disc_cua <- cut(twins_comp$EDUCH, breaks = c(0,12,14,16,20), labels = c("Q1 (0-12]", "Q2 (12-14]", "Q3 (14-16]", "Q4 (16-20]"))
+twins_comp$EDUCL_disc_cua <- cut(twins_comp$EDUCL, breaks = c(0,12,14,16,20), labels = c("Q1 (0-12]", "Q2 (12-14]", "Q3 (14-16]", "Q4 (16-20]"))
 
 
 # Función para calcular los cuartiles, mínimos y máximos
