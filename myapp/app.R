@@ -23,10 +23,6 @@ twins_comp <- na.omit(twins) # datos con registros completos
 #calcular la dimension de la tabla
 dim_datos<- paste("Número de filas:", dim(twins_comp)[1], "\nNúmero de columnas:", dim(twins_comp)[2])
 
-# Seleccionar solo las columnas útiles para el proyecto
-twins_comp %>%
-  select(EDUCH, EDUCL, HRWAGEL, HRWAGEH)
-
 
 # Discretizar años de educación del gemelo 1 y el gemelo 2 
 
@@ -39,36 +35,40 @@ twins_comp$EDUCH_disc_cua <- cut(twins_comp$EDUCH, breaks = c(0,12,14,16,20), la
 twins_comp$EDUCL_disc_cua <- cut(twins_comp$EDUCL, breaks = c(0,12,14,16,20), labels = c("Q1 (0-12)", "Q2 (12-14)", "Q3 (14-16)", "Q4 (16-20)"))
 
 
-# Calcular los cuartiles, mínimos y máximos
+# Función para calcular los cuartiles, mínimos y máximos
 summary_stats <- function(data, var) {
-  q <- quantile(data[[var]], na.rm = TRUE)
+  q <- quantile(data[[var]], na.rm = TRUE)  # Calcular los cuantiles (cuartiles) del conjunto de datos para la variable especificada, ignorando los valores NA
   list(
-    Min = min(data[[var]], na.rm = TRUE),
-    Q1 = q[2],
-    Median = q[3],
-    Q3 = q[4],
-    Max = max(data[[var]], na.rm = TRUE)
+    Min = min(data[[var]], na.rm = TRUE),  # Calcular el valor mínimo de la variable, ignorando los valores NA
+    Q1 = q[2],  # Primer cuartil (Q1)
+    Median = q[3],  # Mediana (Q2)
+    Q3 = q[4],  # Tercer cuartil (Q3)
+    Max = max(data[[var]], na.rm = TRUE)  # Calcular el valor máximo de la variable, ignorando los valores NA
   )
 }
 
-
+# Función para obtener las unidades de medida de la variable
 get_units <- function(variable) {
-  if (variable %in% c("EDUCH", "EDUCL")) {
-    return("Años")
-  } else if (variable %in% c("HRWAGEH", "HRWAGEL")) {
-    return("$")
+  if (variable %in% c("EDUCH", "EDUCL")) {  # Si la variable es EDUCH o EDUCL
+    return("Años")  # La unidad es "Años"
+  } else if (variable %in% c("HRWAGEH", "HRWAGEL")) {  # Si la variable es HRWAGEH o HRWAGEL
+    return("$")  # La unidad es "$" (dólares)
   } else {
-    return("unidades")
+    return("unidades")  # Para otras variables, la unidad es "unidades"
   }
 }
 
+# Calcular las estadísticas resumen para la variable EDUCH en el conjunto de datos twins_comp
 educh_stats <- summary_stats(twins_comp, "EDUCH")
+
+# Calcular las estadísticas resumen para la variable HRWAGEH en el conjunto de datos twins_comp
 hrwageh_stats <- summary_stats(twins_comp, "HRWAGEH")
+
 
 # Definir la interfaz de usuario (UI)
 ui <- dashboardPage(
   # Definir la cabecera del dashboard
-  dashboardHeader(title = "Estudio gemelos"),
+  dashboardHeader(title = "Visualización de datos"),
   
   # Definir la barra lateral del dashboard
   dashboardSidebar(
@@ -88,9 +88,9 @@ ui <- dashboardPage(
         tabName = "Introduccion",
         fluidRow(
           box(
-            title = "Visualización de datos con DotChart: ¿Influye la escolaridad en el salario? Un estudio con gemelos Monocigóticos",  # Título del cuadro
+            h2("Visualización de datos con DotChart: ¿Influye la escolaridad en el salario? Un estudio con gemelos Monocigóticos"),  # Título del cuadro
             width = 12,  # Ancho del cuadro
-            actionButton("toggleTable", "Mostrar Tabla"),  # Botón para mostrar u ocultar la tabla
+            actionButton("toggleTable", "Mostrar Base de datos usada"),  # Botón para mostrar u ocultar la tabla
             hidden(
               div(id = "tabla_container",  # Contenedor de la tabla, inicialmente oculto
                   tableOutput("tabla_twins")  # Salida de la tabla que muestra los datos de los gemelos
@@ -146,7 +146,7 @@ ui <- dashboardPage(
               title = "Medidas de Dispersión del Gemelo 1",  # Título del cuadro para medidas de dispersión del gemelo 1
               width = 12,
               selectInput("variable_gemelo1", "Seleccionar variable:",  # Selector de variable para el gemelo 1
-                          choices = c("EDUCL","HRWAGEL")),  # Opciones del selector
+                          choices = c("Años de educación (EDUCL)" = "EDUCL", "Salario por Hora (HRWAGEL)" = "HRWAGEL")),  # Opciones del selector
               verbatimTextOutput("centros_gemelo1"),  # Salida de medidas centrales para el gemelo 1
               verbatimTextOutput("dispersion_gemelo1"),  # Salida de medidas de dispersión para el gemelo 1
               verbatimTextOutput("cuartiles_gemelo1")  # Salida de cuartiles para el gemelo 1
@@ -158,7 +158,7 @@ ui <- dashboardPage(
               title = "Medidas de Dispersión del Gemelo 2",  # Título del cuadro para medidas de dispersión del gemelo 2
               width = 12,
               selectInput("variable_gemelo2", "Seleccionar variable:",  # Selector de variable para el gemelo 2
-                          choices = c("EDUCH","HRWAGEH")),  # Opciones del selector
+                          choices = c("Años de educación (EDUCH)" = "EDUCH", "Salario por Hora (HRWAGEH)" = "HRWAGEH")),  # Opciones del selector
               verbatimTextOutput("centros_gemelo2"),  # Salida de medidas centrales para el gemelo 2
               verbatimTextOutput("dispersion_gemelo2"),  # Salida de medidas de dispersión para el gemelo 2
               verbatimTextOutput("cuartiles_gemelo2")  # Salida de cuartiles para el gemelo 2
@@ -175,33 +175,47 @@ server <- function(input, output) {
   output$tabla_twins <- renderTable({
     twins_comp
   })
-  
+
   # Mostrar texto en la pestaña de Introducción
   output$texto_introduccion <- renderUI({
-    fluidRow(
-      box(
-        width = 12,
+    fluidRow(  # Crear una fila fluida para organizar el contenido
+      box(  # Caja para contener el contenido
+        width = 12,  # Ancho de la caja (12 columnas, ocupando toda la fila)
+        h4("Objetivo:"),
         textOutput("intro_paragraph"),
-        footer = tagList(
-          tableOutput("data_summary")
+        h4("Información de los registros:"),
+        tableOutput("data_summary"),  # Salida de tabla para mostrar el resumen de datos
+        br(),
+        p("Isabella Gutiérrez, Samuel Rojas y Simón Vélez"), 
+        p("Universidad del Rosario"), 
+        p("Probabilidad y Estadística I"),
+        p("2024-I"),
+        footer = tagList(  # Pie de página de la caja que contendrá una lista de elementos
+          br(),
+          h4("¿De dónde vienen los datos?"),
+          p("Ashenfelter, Orley and Krueger, Alan. Estimates of the Economic Return to Schooling from a New Sample of Twins.
+        The American Economic Review 84.5 (Dic. 1994) 1157-1173.")
         )
       )
     )
   })
   
+  # Generar el texto introductorio
   output$intro_paragraph <- renderText({
     "Se desea estudiar la incidencia de los años de escolaridad en el ingreso por hora, para lo cual, se cuenta con la información de pares de gemelos monocigóticos mayores de 18 años respecto a diversas variables sociodemográficas de interés."
   })
   
+  # Generar la tabla resumen de los datos
   output$data_summary <- renderTable({
     data.frame(
-      "Número de registros" = nrow(twins),
-      "Número de variables" = ncol(twins),
-      "Registros con información completa" = nrow(twins_comp),
-      "Registros con información incompleta" = nrow(twins) - nrow(twins_comp),
-      "Dimensión de la base de datos con la información completa" = dim_datos
+      "Número de registros" = nrow(twins),  # Número total de registros en el conjunto de datos
+      "Número de variables" = ncol(twins),  # Número total de variables en el conjunto de datos
+      "Registros con información completa" = nrow(twins_comp),  # Número de registros con información completa
+      "Registros con información incompleta" = nrow(twins) - nrow(twins_comp),  # Número de registros con información incompleta
+      "Dimensión de la base de datos con la información completa" = dim_datos  # Dimensiones del conjunto de datos con información completa
     )
   })
+  
   
 
   
