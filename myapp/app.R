@@ -130,8 +130,17 @@ ui <- dashboardPage(
         ),
         fluidRow(
           box(
-            title = "Análisis",  # Título del cuadro de análisis (actualmente vacío, se puede agregar contenido posteriormente)
-            width = 12  # Ancho del cuadro
+            title = "Análisis",  # Título del cuadro de análisis
+            width = 12,  # Ancho del cuadro
+            actionButton("botongraficossindisc", "Mostrar Gráficos sin discretizar"),  # Botón para mostrar u ocultar los gráficos discretizados por cuartiles
+            hidden(
+              div(id = "graficos_sindisc",  # Contenedor de los gráficos discretizados por cuartiles, inicialmente oculto
+                  fluidRow(
+                    column(width = 6, plotOutput("dotchart_1")),  # Primera columna con el primer gráfico
+                    column(width = 6, plotOutput("dotchart_2"))   # Segunda columna con el segundo gráfico
+                  )
+              )
+            )
           )
         )
       ),
@@ -224,23 +233,27 @@ server <- function(input, output) {
     toggle("tabla_container")
   })
   
-  # Controlar la visibilidad de las gráficas sin discretizar ___graficos
+  # Controlar la visibilidad de las gráficas discretizadas por cuartiles
   observeEvent(input$botongraficos, {
     toggle("graficos_cuartiles")
   })
   
-  # Controlar la visibilidad de las gráficas discretizadas ___graficos
+  # Controlar la visibilidad de las gráficas discretizadas por nivel educativo
   observeEvent(input$botongraficosdiscretizados, {
     toggle("graficos_nivedu")
   })
   
+  # Controlar la visibilidad de las gráficas sin discretizar
+  observeEvent(input$botongraficossindisc, {
+    toggle("graficos_sindisc")
+  })
   
   
   # Gráfico 1
   output$dotchart_1 <- renderPlot({
     ggplot(twins_comp, aes(x = EDUCL, y = HRWAGEL)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, color = "blue") +
-      labs(title = "Dotchart de gemelo1", x = "Años de educación", y = "Salario por hora ($)") +
+      labs(title = "Dotchart de gemelo 1 sin discretizar", x = "Años de educación", y = "Salario por hora ($)") +
       theme_minimal() 
   })
   
@@ -248,7 +261,7 @@ server <- function(input, output) {
   output$dotchart_2 <- renderPlot({
     ggplot(twins_comp, aes(x = EDUCH, y = HRWAGEH)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "red") +
-      labs(title = "Dotchart de gemelo2", x = "Años de educación", y = "Salario por hora ($)") +
+      labs(title = "Dotchart de gemelo 2 sin discretizar", x = "Años de educación", y = "Salario por hora ($)") +
       theme_minimal()
   })
   
