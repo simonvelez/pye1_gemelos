@@ -67,94 +67,101 @@ hrwageh_stats <- summary_stats(twins_comp, "HRWAGEH")
 
 # Definir la interfaz de usuario (UI)
 ui <- dashboardPage(
+  # Definir la cabecera del dashboard
   dashboardHeader(title = "Estudio gemelos"),
+  
+  # Definir la barra lateral del dashboard
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Introduccion", tabName = "Introduccion", icon = icon("pencil")),
-      menuItem("Gráficos", tabName = "graficos", icon = icon("chart-line")),
-      menuItem("Resumen De Estadísticos", tabName = "analisis", icon = icon("chart-bar"))
+      menuItem("Introduccion", tabName = "Introduccion", icon = icon("pencil")),  # Menú para la sección de introducción
+      menuItem("Gráficos", tabName = "graficos", icon = icon("chart-line")),      # Menú para la sección de gráficos
+      menuItem("Resumen De Estadísticos", tabName = "analisis", icon = icon("chart-bar"))  # Menú para la sección de análisis estadístico
     )
   ),
   
+  # Definir el cuerpo del dashboard
   dashboardBody(
-    useShinyjs(),  # Inicializar shinyjs
+    useShinyjs(),  # Inicializar shinyjs para utilizar funciones JavaScript en la aplicación
     tabItems(
+      # Contenido de la pestaña de introducción
       tabItem(
         tabName = "Introduccion",
         fluidRow(
           box(
-            title = "Visualización de datos con DotChart: ¿Influye la escolaridad en el salario? Un estudio con gemelos Monocigóticos",
-            width = 12,
-            actionButton("toggleTable", "Mostrar Tabla"),
+            title = "Visualización de datos con DotChart: ¿Influye la escolaridad en el salario? Un estudio con gemelos Monocigóticos",  # Título del cuadro
+            width = 12,  # Ancho del cuadro
+            actionButton("toggleTable", "Mostrar Tabla"),  # Botón para mostrar u ocultar la tabla
             hidden(
-              div(id = "tabla_container",
-                  tableOutput("tabla_twins")
+              div(id = "tabla_container",  # Contenedor de la tabla, inicialmente oculto
+                  tableOutput("tabla_twins")  # Salida de la tabla que muestra los datos de los gemelos
               )
             ),
-            uiOutput("texto_introduccion") # Mostrar el texto con la información
-          ),
+            uiOutput("texto_introduccion")  # Salida del texto con la información de introducción
+          )
         )
       ),
+      
+      # Contenido de la pestaña de gráficos
       tabItem(
         tabName = "graficos",
         fluidRow(
           box(
-            title = "Discretizados según nivel educativo",
-            width = 6,
-            actionButton("botongraficosdiscretizados", "Mostrar Gráficos"),
+            title = "Discretizados según nivel educativo",  # Título del cuadro para gráficos discretizados por nivel educativo
+            width = 6,  # Ancho del cuadro
+            actionButton("botongraficosdiscretizados", "Mostrar Gráficos"),  # Botón para mostrar u ocultar los gráficos discretizados por nivel educativo
             hidden(
-              div(id = "graficos_nivedu",
-                  plotOutput("dotchart_discretizadoedu_gemelo1"),
-                  plotOutput("dotchart_discretizadoedu_gemelo2")
+              div(id = "graficos_nivedu",  # Contenedor de los gráficos discretizados por nivel educativo, inicialmente oculto
+                  plotOutput("dotchart_discretizadoedu_gemelo1"),  # Salida del gráfico discretizado por nivel educativo para el gemelo 1
+                  plotOutput("dotchart_discretizadoedu_gemelo2")   # Salida del gráfico discretizado por nivel educativo para el gemelo 2
               )
             )
           ),
           box(
-            title = "Discretizados según cuartiles",
-            width = 6,
-            actionButton("botongraficos", "Mostrar Gráficos"),
+            title = "Discretizados según cuartiles",  # Título del cuadro para gráficos discretizados por cuartiles
+            width = 6,  # Ancho del cuadro
+            actionButton("botongraficos", "Mostrar Gráficos"),  # Botón para mostrar u ocultar los gráficos discretizados por cuartiles
             hidden(
-              div(id = "graficos_cuartiles",
-                  plotOutput("dotchart_discretizadocua_gemelo1"),
-                  plotOutput("dotchart_discretizadocua_gemelo2")
+              div(id = "graficos_cuartiles",  # Contenedor de los gráficos discretizados por cuartiles, inicialmente oculto
+                  plotOutput("dotchart_discretizadocua_gemelo1"),  # Salida del gráfico discretizado por cuartiles para el gemelo 1
+                  plotOutput("dotchart_discretizadocua_gemelo2")   # Salida del gráfico discretizado por cuartiles para el gemelo 2
               )
             )
           )
         ),
         fluidRow(
           box(
-            title = "Análisis",
-            width = 12 
+            title = "Análisis",  # Título del cuadro de análisis (actualmente vacío, se puede agregar contenido posteriormente)
+            width = 12  # Ancho del cuadro
           )
         )
       ),
+      
+      # Contenido de la pestaña de análisis estadístico
       tabItem(
         tabName = "analisis",
         fluidRow(
           column(
             width = 6,
             box(
-              title = "Medidas de Dispersión del Gemelo 1",
+              title = "Medidas de Dispersión del Gemelo 1",  # Título del cuadro para medidas de dispersión del gemelo 1
               width = 12,
-              selectInput("variable_gemelo1", "Seleccionar variable:",
-                          choices = c("EDUCL","HRWAGEL")),
-              verbatimTextOutput("centros_gemelo1"),
-              verbatimTextOutput("dispersion_gemelo1"),
-              verbatimTextOutput("cuartiles_gemelo1") # Agregar salida para cuartiles
-              
+              selectInput("variable_gemelo1", "Seleccionar variable:",  # Selector de variable para el gemelo 1
+                          choices = c("EDUCL","HRWAGEL")),  # Opciones del selector
+              verbatimTextOutput("centros_gemelo1"),  # Salida de medidas centrales para el gemelo 1
+              verbatimTextOutput("dispersion_gemelo1"),  # Salida de medidas de dispersión para el gemelo 1
+              verbatimTextOutput("cuartiles_gemelo1")  # Salida de cuartiles para el gemelo 1
             )
           ),
           column(
             width = 6,
             box(
-              title = "Medidas de Dispersión del Gemelo 2",
+              title = "Medidas de Dispersión del Gemelo 2",  # Título del cuadro para medidas de dispersión del gemelo 2
               width = 12,
-              selectInput("variable_gemelo2", "Seleccionar variable:",
-                          choices = c("EDUCH","HRWAGEH")),
-              verbatimTextOutput("centros_gemelo2"),
-              verbatimTextOutput("dispersion_gemelo2"),
-              verbatimTextOutput("cuartiles_gemelo2") # Agregar salida para cuartiles
-              
+              selectInput("variable_gemelo2", "Seleccionar variable:",  # Selector de variable para el gemelo 2
+                          choices = c("EDUCH","HRWAGEH")),  # Opciones del selector
+              verbatimTextOutput("centros_gemelo2"),  # Salida de medidas centrales para el gemelo 2
+              verbatimTextOutput("dispersion_gemelo2"),  # Salida de medidas de dispersión para el gemelo 2
+              verbatimTextOutput("cuartiles_gemelo2")  # Salida de cuartiles para el gemelo 2
             )
           )
         )
