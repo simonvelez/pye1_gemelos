@@ -133,6 +133,9 @@ ui <- dashboardPage(
             title = "Análisis",  # Título del cuadro de análisis
             width = 12,  # Ancho del cuadro
             uiOutput("texto_analisis"),
+            uiOutput("texto_analisis_1"),
+            uiOutput("texto_analisis_2"),
+            uiOutput("texto_analisis_3"),
             actionButton("botongraficossindisc", "Mostrar Gráficos sin discretizar"),# Botón para mostrar u ocultar los gráficos discretizados por cuartiles
             hidden(
               div(id = "graficos_sindisc",  # Contenedor de los gráficos discretizados por cuartiles, inicialmente oculto
@@ -216,20 +219,36 @@ server <- function(input, output) {
   })
   
 
+  #renderizar el texto de analisis
   output$texto_analisis <- renderUI({
     fluidRow(  # Crear una fila fluida para organizar el contenido
       box(  # Caja para contener el contenido
         width = 12,  # Ancho de la caja (12 columnas, ocupando toda la fila)
         textOutput("intro_analisis_1"),
-        
         br(),
+        textOutput("intro_analisis_2"),
+        br(),
+        textOutput("intro_analisis_3"),
+        br(),
+        textOutput("intro_analisis_4")
       )
     )
   })
   
+  # texto analisis
   output$intro_analisis_1 <- renderText({
     "Se utilizó un gráfico de dotchart que facilita la relación entre dos variables salario por hora y años de educación, esto porque los dot plots representan cada dato individualmente, siendo esta última una característica a destacar en la implementación de este mismo, permitiendo así una comprensión precisa de la distribución y frecuencia de los datos, algo que solo es posible debido a que la base de datos empleada no es tan extensa, ya que una base de datos mucho más amplia generaría un impedimento para la limpia visualización de la gráfica.Para el uso de éste tipo de gráfico fue necesario discretizar la variable de años de educación, puesto que los valores continuos pueden ser muy amplios, 
     lo que limita representarlos cada uno como un punto individual."})
+  
+  output$intro_analisis_2 <- renderText({
+    "Ambas gráficas evidencian que a medida que aumentan los años de educación, los salarios también tienden a aumentar. Esto es particularmente evidente en los intervalos más altos de años de educación (16-22), en donde encontramos la mayor media de salario entre los niveles de educación, sin embargo, indican un aumento en la desviación estándar, lo que significa que puede no ser beneficioso para aquellas personas que tienen más años de educación,
+    puesto que sus salarios se pueden igualar o superar con un nivel de educación menor."})
+  output$intro_analisis_3 <- renderText({
+    "En primer lugar, realizando una comparación entre las dos gráficas discretizadas, en la gráfica del gemelo 1 podemos observar que hay menor varianza en los datos, es decir cumple con el análisis de las gráficas anteriormente mencionado, por lo que en la gráfica se aprecia una  gran cantidad de puntos concentrados en un mismo intervalo de salario,lo que los vuelve más representativos. En cambio, en la gráfica de los gemelos 2, presentan coeficiente de variación mayor en los intervalos de salario con respecto a los intervalos de la edad, es decir, hay más datos alejados a la media,lo que implica una media menos representativa.
+    Por otra parte, las medidas de dispersión indican que la mayor parte de gemelos encuestados obtuvieron como máximo nivel de educación la secundaria, (12 años), por lo que la moda del salario se encuentra en $5 provenientes mayoritariamente de los gemelos con esta educación."})
+  output$intro_analisis_4 <- renderText({
+    "En segundo lugar, en la gráfica dividida por cuartiles se puede ver con mayor detalle, los datos atípicos en las dos gráficas, es decir, datos muy alejados de la media. En la gráfica de los gemelos 1 teniendo una mayor cantidad de años estudiados, el promedio del salario se mantiene en el mismo intervalo de 0 a 25 dólares por hora, siendo solamente 7  los gemelos que superan a este mismo, lo que implica que estos datos son más representativos para generar conclusiones al respecto del sueldo de los gemelos 1,
+    sin embargo en la gráfica de los gemelos 2 hay mayor cantidad de datos atípicos por intervalos, lo que se vuelve menos representativo para las conclusiones."})
   
   
   # Generar la tabla resumen de los datos
@@ -413,7 +432,6 @@ server <- function(input, output) {
     ymax <- m+sd(x)
     return(c(y=m,ymin=ymin,ymax=ymax))
   }
-  
 }
 # Ejecutar la aplicación Shiny
 shinyApp(ui = ui, server = server)
