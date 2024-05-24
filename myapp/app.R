@@ -132,7 +132,8 @@ ui <- dashboardPage(
           box(
             title = "Análisis",  # Título del cuadro de análisis
             width = 12,  # Ancho del cuadro
-            actionButton("botongraficossindisc", "Mostrar Gráficos sin discretizar"),  # Botón para mostrar u ocultar los gráficos discretizados por cuartiles
+            uiOutput("texto_analisis"),
+            actionButton("botongraficossindisc", "Mostrar Gráficos sin discretizar"),# Botón para mostrar u ocultar los gráficos discretizados por cuartiles
             hidden(
               div(id = "graficos_sindisc",  # Contenedor de los gráficos discretizados por cuartiles, inicialmente oculto
                   fluidRow(
@@ -213,6 +214,23 @@ server <- function(input, output) {
   output$intro_paragraph <- renderText({
     "Se desea estudiar la incidencia de los años de escolaridad en el ingreso por hora, para lo cual, se cuenta con la información de pares de gemelos monocigóticos mayores de 18 años respecto a diversas variables sociodemográficas de interés."
   })
+  
+
+  output$texto_analisis <- renderUI({
+    fluidRow(  # Crear una fila fluida para organizar el contenido
+      box(  # Caja para contener el contenido
+        width = 12,  # Ancho de la caja (12 columnas, ocupando toda la fila)
+        textOutput("intro_analisis_1"),
+        
+        br(),
+      )
+    )
+  })
+  
+  output$intro_analisis_1 <- renderText({
+    "Se utilizó un gráfico de dotchart que facilita la relación entre dos variables salario por hora y años de educación, esto porque los dot plots representan cada dato individualmente, siendo esta última una característica a destacar en la implementación de este mismo, permitiendo así una comprensión precisa de la distribución y frecuencia de los datos, algo que solo es posible debido a que la base de datos empleada no es tan extensa, ya que una base de datos mucho más amplia generaría un impedimento para la limpia visualización de la gráfica.Para el uso de éste tipo de gráfico fue necesario discretizar la variable de años de educación, puesto que los valores continuos pueden ser muy amplios, 
+    lo que limita representarlos cada uno como un punto individual."})
+  
   
   # Generar la tabla resumen de los datos
   output$data_summary <- renderTable({
