@@ -88,7 +88,7 @@ ui <- dashboardPage(
           box(
             title = "Visualización de datos con DotChart: ¿Influye la escolaridad en el salario? Un estudio con gemelos Monocigóticos",
             width = 12,
-            actionButton("toggleTable", "Mostrar Tabla"),
+            actionButton("toggleTable", "Mostrar/Ocultar Tabla"),
             hidden(
               div(id = "tabla_container",
                   tableOutput("tabla_twins")
@@ -104,7 +104,7 @@ ui <- dashboardPage(
           box(
             title = "Gráficos Discretizados",
             width = 6,
-            actionButton("botongraficosdiscretizados", "Mostrar Gráficos"),
+            actionButton("botongraficosdiscretizados", "Mostrar/Ocultar Gráficos Discretizados"),
             hidden(
               div(id = "graficas_discretizadas",
                   plotOutput("dotchart_discretizado_gemelo1"),
@@ -115,19 +115,13 @@ ui <- dashboardPage(
           box(
             title = "Gráficos sin Discretizar",
             width = 6,
-            actionButton("botongraficos", "Mostrar Gráficos"),
+            actionButton("botongraficos", "Mostrar/Ocultar Gráficos Continuos"),
             hidden(
               div(id = "graficos_sindiscretizar",
                   plotOutput("dotchart_1"),
                   plotOutput("dotchart_2")
               )
             )
-          )
-        ),
-        fluidRow(
-          box(
-            title = "Análisis",
-            width = 12 
           )
         )
       ),
@@ -251,14 +245,14 @@ server <- function(input, output) {
   # Gráfico discretizado por cuartiles gemelo 1
   output$dotchart_discretizadocua_gemelo1 <- renderPlot({
     ggplot(twins_comp, aes(x = EDUCL_disc_cua, y = HRWAGEL)) +
-      geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "blue") +
+      geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "green") +
       labs(title = "Dotchart Discretizado por intervalos de Gemelo 1", x = "Años de educación (Discretizado por cuartiles)", y = "Salario por hora ($)") +
       theme_minimal()+stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "red")
   })
   # Gráfico discretizado por cuartiles gemelo 2
   output$dotchart_discretizadocua_gemelo2 <- renderPlot({
     ggplot(twins_comp, aes(x = EDUCH_disc_cua, y = HRWAGEH)) +
-      geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "orange") +
+      geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "purple") +
       labs(title = "Dotchart Discretizado por intervalos de Gemelo 2", x = "Años de educación (Discretizado por cuartiles)", y = "Salario por hora ($)") +
       theme_minimal()+stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "red")
   })
