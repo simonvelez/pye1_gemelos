@@ -271,14 +271,14 @@ server <- function(input, output) {
     ggplot(twins_comp, aes(x = EDUCL_disc_edu, y = HRWAGEL)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "green") +
       labs(title = "Dotchart Discretizado según nivel educativo de Gemelo 1", x = "Años de educación (Discretizado según nivel educativo)", y = "Salario por hora ($)") +
-      theme_minimal()+stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "red")
+      theme_minimal()+stat_summary(fun.data=data_summary, color="red")
   })
   # Gráfico discretizado según educación gemelo 2
   output$dotchart_discretizadoedu_gemelo2 <- renderPlot({
     ggplot(twins_comp, aes(x = EDUCH_disc_edu, y = HRWAGEH)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "purple") +
       labs(title = "Dotchart Discretizado según nivel educativo de Gemelo 2", x = "Años de educación (Discretizado según nivel educativo)", y = "Salario por hora ($)") +
-      theme_minimal()+stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "red")
+      theme_minimal()+stat_summary(fun.data=data_summary, color="red")
   })
   
   # Gráfico discretizado por cuartiles gemelo 1
@@ -286,14 +286,14 @@ server <- function(input, output) {
     ggplot(twins_comp, aes(x = EDUCL_disc_cua, y = HRWAGEL)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "blue") +
       labs(title = "Dotchart Discretizado por intervalos de Gemelo 1", x = "Años de educación (Discretizado por cuartiles)", y = "Salario por hora ($)") +
-      theme_minimal()+stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "red")
+      theme_minimal()+stat_summary(fun.data=data_summary, color="red")
   })
   # Gráfico discretizado por cuartiles gemelo 2
   output$dotchart_discretizadocua_gemelo2 <- renderPlot({
     ggplot(twins_comp, aes(x = EDUCH_disc_cua, y = HRWAGEH)) +
       geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.5, color = "orange") +
       labs(title = "Dotchart Discretizado por intervalos de Gemelo 2", x = "Años de educación (Discretizado por cuartiles)", y = "Salario por hora ($)") +
-      theme_minimal()+stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "red")
+      theme_minimal()+stat_summary(fun.data=data_summary, color="red")
   })
   
   # Calcular medidas de dispersión para gemelo 1
@@ -387,6 +387,14 @@ server <- function(input, output) {
           "Media de", variable, ":", round(media, 2), units, "\n",
           "Mediana de", variable, ":", round(mediana, 2), units)
 })
+  
+  # Función para mostrar la media y la meida +/- sd
+  data_summary <- function(x) {
+    m <- mean(x)
+    ymin <- m-sd(x)
+    ymax <- m+sd(x)
+    return(c(y=m,ymin=ymin,ymax=ymax))
+  }
   
 }
 # Ejecutar la aplicación Shiny
