@@ -11,3 +11,4 @@ shinylive::export(appdir = "myapp", destdir = "docs")
 
 # Para probar que funcione bien. Abre la app estática
 httpuv::runStaticServer("docs/", port=8008)
+
