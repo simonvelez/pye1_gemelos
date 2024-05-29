@@ -340,13 +340,12 @@ server <- function(input, output) {
     dispersion_result <- twins_comp[[var]]
     units <- get_units(var)
     
-    dispersion <- sprintf("Dispersión: %.2f %s", round(sd(dispersion_result, na.rm = TRUE), 2), units)
     rango <- sprintf("Rango: %.2f %s", round(diff(range(dispersion_result, na.rm = TRUE)), 2), units)
     varianza <- sprintf("Varianza: %.2f %s^2", round(var(dispersion_result, na.rm = TRUE), 2), units)
     desviacion_estandar <- sprintf("Desviación Estándar: %.2f %s", round(sd(dispersion_result, na.rm = TRUE), 2), units)
     coeficiente_variacion <- sprintf("Coeficiente de Variación: %.2f %%", round(sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE), 2) * 100)
     
-    paste(dispersion, rango, varianza, desviacion_estandar, coeficiente_variacion, sep = "\n")
+    paste(rango, varianza, desviacion_estandar, coeficiente_variacion, sep = "\n")
   })
   # Calcular medidas de dispersión para gemelo 2
   output$dispersion_gemelo2 <- renderText({
@@ -355,13 +354,12 @@ server <- function(input, output) {
     dispersion_result <- twins_comp[[var]]
     units <- get_units(var)
     
-    dispersion <- sprintf("Dispersión: %.2f %s", round(sd(dispersion_result, na.rm = TRUE), 2), units)
     rango <- sprintf("Rango: %.2f %s", round(diff(range(dispersion_result, na.rm = TRUE)), 2), units)
     varianza <- sprintf("Varianza: %.2f %s^2", round(var(dispersion_result, na.rm = TRUE), 2), units)
     desviacion_estandar <- sprintf("Desviación Estándar: %.2f %s", round(sd(dispersion_result, na.rm = TRUE), 2), units)
     coeficiente_variacion <- sprintf("Coeficiente de Variación: %.2f %%", round(sd(dispersion_result, na.rm = TRUE) / mean(dispersion_result, na.rm = TRUE), 2) * 100)
     
-    paste(dispersion, rango, varianza, desviacion_estandar, coeficiente_variacion, sep = "\n")
+    paste(rango, varianza, desviacion_estandar, coeficiente_variacion, sep = "\n")
   })
   
   
