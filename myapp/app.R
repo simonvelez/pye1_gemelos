@@ -237,8 +237,9 @@ server <- function(input, output) {
   
   # texto analisis
   output$intro_analisis_1 <- renderText({
-    "Se utilizó un gráfico de dotchart que facilita la relación entre dos variables salario por hora y años de educación, esto porque los dot plots representan cada dato individualmente, siendo esta última una característica a destacar en la implementación de este mismo, permitiendo así una comprensión precisa de la distribución y frecuencia de los datos, algo que solo es posible debido a que la base de datos empleada no es tan extensa, ya que una base de datos mucho más amplia generaría un impedimento para la limpia visualización de la gráfica.Para el uso de éste tipo de gráfico fue necesario discretizar la variable de años de educación, puesto que los valores continuos pueden ser muy amplios, 
-    lo que limita representarlos cada uno como un punto individual."})
+    "Se utilizó un gráfico de dotchart que facilita la relación entre dos variables salario por hora y años de educación, esto porque los dot plots representan cada dato individualmente,
+    siendo esta última una característica a destacar en la implementación de este mismo, permitiendo así una comprensión precisa de la distribución y frecuencia de los datos, algo que solo es posible debido a que la base de datos empleada no es tan extensa, ya que una base de datos mucho más amplia generaría un impedimento para la limpia visualización de la gráfica.Para el uso de éste tipo de gráfico fue necesario discretizar la variable de años de educación, puesto que los valores continuos pueden ser muy amplios, 
+    lo que limita representarlos cada uno como un punto individual. Lo que se hizo fue modificar la variable de años de educación a una variable cualitativa ordinal, siendo esta misma, los niveles de educación, Secundaria, Pregrado, Posgrado."})
   
   output$intro_analisis_2 <- renderText({
     "Ambas gráficas evidencian que a medida que aumentan los años de educación, los salarios también tienden a aumentar. Esto es particularmente evidente en los intervalos más altos de años de educación (16-22), en donde encontramos la mayor media de salario entre los niveles de educación, sin embargo, indican un aumento en la desviación estándar, lo que significa que puede no ser beneficioso para aquellas personas que tienen más años de educación,
